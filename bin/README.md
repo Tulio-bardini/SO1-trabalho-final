@@ -1,0 +1,2 @@
+- Para compilar o código basta usar o comando "make" dentro do diretório.
+- Para deletar os arquivos .o basta usar o comando "make clean".
