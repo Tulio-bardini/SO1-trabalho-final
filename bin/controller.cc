@@ -17,41 +17,43 @@
 
 __BEGIN_API
 
-Controller::Controller(Ship * shipVec)
+Controller::Controller(bool *finish, Ship * shipVec)
 {
     ship = shipVec;
+    _finish = finish;
+    acao = act::action::NO_ACTION;
 }
 
 void Controller::input() {
-    while (1==1)
+    while (!*_finish)
     {
         if (al_key_down(&kb, ALLEGRO_KEY_UP)) {
-            ship->putY(-250);
+            ship->putY(-280);
         }
         if (al_key_down(&kb, ALLEGRO_KEY_RIGHT)) {
-            ship->putX(250);
+            ship->putX(280);
         }
         if (al_key_down(&kb, ALLEGRO_KEY_DOWN)) {
-            ship->putY(250);
+            ship->putY(280);
         }
         if (al_key_down(&kb, ALLEGRO_KEY_LEFT)) {
-            ship->putX(-250);
+            ship->putX(-280);
         }
         if (al_key_down(&kb, ALLEGRO_KEY_1)) {
-            std::cout << "missel\n";
-            act::action::FIRE_PRIMARY;
+            acao = act::action::FIRE_PRIMARY;
         }
         if (al_key_down(&kb, ALLEGRO_KEY_SPACE)) {
-            std::cout << "tiro normal\n";
-            act::action::FIRE_SECONDARY;
+            acao = act::action::FIRE_SECONDARY;
         }
         if (al_key_down(&kb, ALLEGRO_KEY_ESCAPE)) {
             std::cout << "sair\n";
-            act::action::QUIT_GAME;
+            acao = act::action::QUIT_GAME;
         }
         Thread::yield();
     }
-    
+
+    Thread::running()->thread_exit(0);
+
 }
 
 

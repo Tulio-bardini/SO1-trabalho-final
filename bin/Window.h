@@ -11,6 +11,7 @@
 #include <allegro5/allegro.h>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "Sprite.h"
 #include "Vector.h"
@@ -21,6 +22,8 @@
 #include "semaphore.h"
 #include "ship.h"
 #include "controller.h"
+#include "Laser.h"
+#include "Timer.h"
 
 
 __BEGIN_API
@@ -40,10 +43,16 @@ class Window {
    void draw();
    void update(double dt);
 
+   void addLaser(const Point& cen, const ALLEGRO_COLOR& col, const Vector& spd);
+
    void gameLoop(float& prevTime);
 
-   void drawShip(std::shared_ptr<Sprite> sprite, int flags);
    void drawBackground();
+   void drawLaser();
+
+   // Threads
+   void createThreads();
+   void deleteThreads();
 
    inline int getWidth() const {
       return _displayWidth;
@@ -58,11 +67,13 @@ class Window {
    //Static Functions
    static void runShip(Ship * ship);
    static void runController(Controller * controller);
+   static void runLaser(std::list<Laser> *laserVector,  bool * finish);
 
   private:
    void loadSprites();
-   //Checks data of the spaceship
-   std::shared_ptr<Sprite> spaceShip;
+   //Checks data sprites
+   std::list<Laser> laserList;
+   std::shared_ptr<Timer> _WeaponTimer;
    Point centre;        /**< ship position */
    ALLEGRO_COLOR color; /**< ship color */   
    Vector speed;        /**< movement speed in any direction */
@@ -77,6 +88,7 @@ class Window {
    Vector fgSpeed;
    std::shared_ptr<Sprite> bg;/**<shared pointer to background animation */
    std::shared_ptr<Sprite> fg;
+   
 
    //ship
    Ship * ship;
@@ -86,6 +98,8 @@ class Window {
    Controller * controller;
    Thread * controllerThread;
 
+   //laser
+   Thread * laserThread;
 
    // general game variables
    int _displayWidth;

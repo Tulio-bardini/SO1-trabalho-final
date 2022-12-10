@@ -17,11 +17,14 @@ __BEGIN_API
 class Ship {
 
 public:
-    Ship();
-    void update();
+    Ship(bool *finish);
+    ~Ship();
+    void run(); 
     void putX(int x);
     void putY(int y);
+    void draw();
 
+    std::shared_ptr<Sprite> shipSprite;
     Point centre;
     int row; /**<row of animation to be played */
     int col; /**< column of animation to be played */
@@ -29,6 +32,9 @@ private:
     void selectShipAnimation();
     void checkBoundary();
     Vector speed;
+    bool *_finish;
+    float _crtTime = 0;
+    float _prevTime = 0;
 
     // general game variables
 

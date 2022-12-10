@@ -16,22 +16,44 @@
 
 __BEGIN_API
 
-Ship::Ship()
+Ship::Ship(bool *finish)
 {
-    centre = Point(215, 245);
+   centre = Point(215, 245);
+   _finish = finish;
+
+    // Go to resources directory
+   ALLEGRO_PATH *path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+   al_append_path_component(path, "resources");
+   al_change_directory(al_path_cstr(path, '/'));
+
+   shipSprite = std::make_shared<Sprite> ("Sprite2.png"); //espaçonave do usuário
 }
 
-void Ship::update() {
-    while (1==1)
-    {
-        centre = centre + speed * 0.018;
-        selectShipAnimation();
-        checkBoundary();
-        speed = Vector(0, 0);
-        Thread::yield();
-    }
+Ship::~Ship() {
+   shipSprite.reset();
+}
+
+void Ship::run() {
+   
+   while (!*_finish)
+   {
+      _crtTime = al_current_time();
+      centre = centre + speed * (_crtTime - _prevTime);
+      selectShipAnimation();
+      _prevTime = _crtTime;
+      speed = Vector(0, 0);
+      checkBoundary();
+
+      Thread::yield();
+   }
+   Thread::running()->thread_exit(0);
     
-    
+}
+
+void Ship::draw() {
+
+   shipSprite->draw_region(row, col, 47.0, 40.0, centre, 0);
+
 }
 
 void Ship::selectShipAnimation() {
@@ -68,5 +90,6 @@ void Ship::putX(int x) {
 void Ship::putY(int y) {
     speed.y += y;
 }
+
 
 __END_API

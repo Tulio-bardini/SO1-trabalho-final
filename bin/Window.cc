@@ -17,6 +17,9 @@
 #include "Timer.h"
 __BEGIN_API
 
+const int WEAPON_DELAY_LASER_VERSUS = 10;
+const Vector PROJECTILE_SPEED = Vector(500, 0);
+
 Window::Window(int w, int h, int fps) : _displayWidth(w), _displayHeight(h), 
 					_fps(fps),
 					_timer(NULL),
@@ -32,7 +35,6 @@ Window::~Window() {
    if (_display != NULL) al_destroy_display(_display);
 
    bg.reset();
-   spaceShip.reset();
 
 }
 
@@ -71,6 +73,9 @@ void Window::init() {
       std::cerr << "Could not install keyboard\n";
    }
    
+   _WeaponTimer = std::make_shared<Timer> (_fps);
+   _WeaponTimer->create();
+   _WeaponTimer->startTimer();
    
    // register keyboard
    al_register_event_source(_eventQueue, al_get_keyboard_event_source());
@@ -88,6 +93,8 @@ void Window::run() {
       gameLoop(prevTime);
    }
 
+   deleteThreads();
+
 }
 
 void Window::gameLoop(float& prevTime) {
@@ -103,11 +110,19 @@ void Window::gameLoop(float& prevTime) {
    al_wait_for_event(_eventQueue, &event);
 
    // _display closes
-   if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+   if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE || controller->acao == act::action::QUIT_GAME) {
       _finish = true;
       return;
    }
-   
+
+   if (controller->acao == act::action::FIRE_SECONDARY) {
+      if (_WeaponTimer->getCount() > WEAPON_DELAY_LASER_VERSUS) {
+         addLaser(ship->centre, al_map_rgb(200,0,0), PROJECTILE_SPEED);
+         _WeaponTimer->srsTimer();
+      }
+      controller->acao = act::action::NO_ACTION;
+   }
+
    // timer
    if (event.type == ALLEGRO_EVENT_TIMER) {
       crtTime = al_current_time();
@@ -139,31 +154,30 @@ void Window::update(double dt) {
 // draws for the game mode
 void Window::draw() {   
    drawBackground();
-   drawShip(spaceShip, 0);
+   drawLaser();
+   ship->draw();
 
-}
-
-void Window::drawShip(std::shared_ptr<Sprite> sprite, int flags) {
-   sprite->draw_region(ship->row, ship->col, 47.0, 40.0, ship->centre, flags);
 }
 
 void Window::drawBackground() {
    bg->draw_parallax_background(bgMid.x, 0);
 }
 
+void Window::drawLaser() {
+   if (laserList.size() != 0) {
+      for (std::list<Laser>::iterator it = laserList.begin();
+	   it != laserList.end(); ++it) {
+         it->draw();
+      }
+   }
+}
 
 void Window::loadSprites()
 {
    
    color= al_map_rgb(0, 200, 0);
 
-   // Create Ship
-   ship = new Ship();
-   shipThread = new Thread(runShip, ship);
-
-   // Create Controller
-   controller = new Controller(ship);
-   controllerThread = new Thread(runController, controller);
+   createThreads();
 
    // represents the middle of the image width-wise, and top height-wise
    bgMid = Point(0, 0);
@@ -177,8 +191,7 @@ void Window::loadSprites()
    al_append_path_component(path, "resources");
    al_change_directory(al_path_cstr(path, '/'));   
    // sprites
-   spaceShip = std::make_shared<Sprite> ("Sprite2.png"); //espaçonave do usuário
-   
+
    bg = std::make_shared<Sprite> ("BGstars.png"); //fundo da tela - background
    // delete path 
    al_destroy_path(path);
@@ -186,9 +199,40 @@ void Window::loadSprites()
 
 }
 
+void Window::addLaser(const Point& cen, const ALLEGRO_COLOR& col, const Vector& spd) {
+   laserList.push_back(Laser(cen, col, spd));
+}
+
+void Window::createThreads() {
+
+   // Create Ship
+   ship = new Ship(&_finish);
+   shipThread = new Thread(runShip, ship);
+
+   // Create Controller
+   controller = new Controller(&_finish, ship);
+   controllerThread = new Thread(runController, controller);
+
+   // Create Laser
+   laserThread = new Thread(runLaser, &laserList, &_finish);
+
+}
+
+void Window::deleteThreads() {
+
+   shipThread->join();
+   controllerThread->join();
+   laserThread->join();
+
+   delete shipThread;
+   delete controller;
+   delete laserThread;
+}
+
 void Window::runShip(Ship * ship) {
 
-   ship->update();
+   ship->run();
+   delete ship;
 
 }
 
@@ -197,5 +241,30 @@ void Window::runController(Controller * controller) {
    controller->input();
 
 }
+
+void Window::runLaser(std::list<Laser> *laserVector, bool * finish) {
+
+   while(!*finish) {
+      if (!laserVector->empty()) {
+         for (std::list<Laser>::iterator it = laserVector->begin();
+         it != laserVector->end(); ++it) {
+            it->update();
+         }
+         std::list<Laser> newLaserVector;
+         for (auto it = laserVector->begin(); it != laserVector->end(); ++it) {
+            if (it->live) {
+               newLaserVector.push_back(*it);
+            }	 
+         }
+            laserVector->clear();
+            laserVector->assign(newLaserVector.begin(), newLaserVector.end());
+         }
+      Thread::yield();
+      }
+
+   Thread::running()->thread_exit(0);
+
+   }
+
 
 __END_API   
