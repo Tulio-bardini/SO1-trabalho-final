@@ -24,6 +24,7 @@
 #include "controller.h"
 #include "Laser.h"
 #include "Timer.h"
+#include "enemyPurple.h"
 
 
 __BEGIN_API
@@ -41,14 +42,16 @@ class Window {
    void init();
    void run();
    void draw();
-   void update(double dt);
+   void update();
 
    void addLaser(const Point& cen, const ALLEGRO_COLOR& col, const Vector& spd);
+   void spawEnemys();
 
    void gameLoop(float& prevTime);
 
    void drawBackground();
    void drawLaser();
+   void drawEnemys();
 
    // Threads
    void createThreads();
@@ -68,12 +71,15 @@ class Window {
    static void runShip(Ship * ship);
    static void runController(Controller * controller);
    static void runLaser(std::list<Laser> *laserVector,  bool * finish);
+   static void runEnemys(std::list< std::shared_ptr<EnemyPurple> > *enemyList, bool * finish);
 
   private:
    void loadSprites();
    //Checks data sprites
    std::list<Laser> laserList;
+   std::list< std::shared_ptr<EnemyPurple> > enemyList; 
    std::shared_ptr<Timer> _WeaponTimer;
+   std::shared_ptr<Timer> _EnemyTimer;
    Point centre;        /**< ship position */
    ALLEGRO_COLOR color; /**< ship color */   
    Vector speed;        /**< movement speed in any direction */
@@ -101,10 +107,16 @@ class Window {
    //laser
    Thread * laserThread;
 
+   //enemys
+   Thread * enemyThread;
+
    // general game variables
    int _displayWidth;
    int _displayHeight;
    int _fps;
+   float dt;
+   float crtTime = 0;
+   float prevTime = 0;
    // allegro objects
    ALLEGRO_TIMER *_timer;
    ALLEGRO_EVENT_QUEUE *_eventQueue;

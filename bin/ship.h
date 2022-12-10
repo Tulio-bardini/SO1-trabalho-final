@@ -17,7 +17,7 @@ __BEGIN_API
 class Ship {
 
 public:
-    Ship(bool *finish);
+    Ship(bool *finish, float *dt);
     ~Ship();
     void run(); 
     void putX(int x);
@@ -33,6 +33,7 @@ private:
     void checkBoundary();
     Vector speed;
     bool *_finish;
+    float *_dt;
     float _crtTime = 0;
     float _prevTime = 0;
 

@@ -13,11 +13,13 @@
 #include "thread.h"
 #include "semaphore.h"
 #include "ship.h"
+#include "enemyPurple.h"
 
 #include "Timer.h"
 __BEGIN_API
 
 const int WEAPON_DELAY_LASER_VERSUS = 10;
+const int ORDER_ENEMYS_DELAY = 200;
 const Vector PROJECTILE_SPEED = Vector(500, 0);
 
 Window::Window(int w, int h, int fps) : _displayWidth(w), _displayHeight(h), 
@@ -72,15 +74,23 @@ void Window::init() {
    if (!al_install_keyboard()) {
       std::cerr << "Could not install keyboard\n";
    }
+
+   crtTime = al_current_time();
+   dt = crtTime - prevTime;
+   prevTime = crtTime;
    
+   // Start timers
    _WeaponTimer = std::make_shared<Timer> (_fps);
    _WeaponTimer->create();
    _WeaponTimer->startTimer();
+   _EnemyTimer = std::make_shared<Timer> (_fps);
+   _EnemyTimer->create();
+   _EnemyTimer->startTimer();
    
    // register keyboard
    al_register_event_source(_eventQueue, al_get_keyboard_event_source());
    
-
+   createThreads();
    loadSprites();
 }
 
@@ -116,17 +126,20 @@ void Window::gameLoop(float& prevTime) {
    }
 
    if (controller->acao == act::action::FIRE_SECONDARY) {
-      if (_WeaponTimer->getCount() > WEAPON_DELAY_LASER_VERSUS) {
-         addLaser(ship->centre, al_map_rgb(200,0,0), PROJECTILE_SPEED);
-         _WeaponTimer->srsTimer();
-      }
+      addLaser(ship->centre, al_map_rgb(200,0,0), PROJECTILE_SPEED);
       controller->acao = act::action::NO_ACTION;
    }
 
-   // timer
+   crtTime = al_current_time();
+   dt = crtTime - prevTime;
+   prevTime = crtTime;
+
+   spawEnemys();
+
+    // timer
    if (event.type == ALLEGRO_EVENT_TIMER) {
       crtTime = al_current_time();
-      update(crtTime - prevTime);
+      update();
       prevTime = crtTime;
       redraw = true;
    }
@@ -142,7 +155,7 @@ void Window::gameLoop(float& prevTime) {
 }
 
 // update the game mode
-void Window::update(double dt) {
+void Window::update() {
 
    // background
    bgMid = bgMid + bgSpeed * dt;   
@@ -156,6 +169,7 @@ void Window::draw() {
    drawBackground();
    drawLaser();
    ship->draw();
+   drawEnemys();
 
 }
 
@@ -164,7 +178,7 @@ void Window::drawBackground() {
 }
 
 void Window::drawLaser() {
-   if (laserList.size() != 0) {
+   if (!laserList.empty()) {
       for (std::list<Laser>::iterator it = laserList.begin();
 	   it != laserList.end(); ++it) {
          it->draw();
@@ -172,12 +186,16 @@ void Window::drawLaser() {
    }
 }
 
+void Window::drawEnemys() {
+   if (!enemyList.empty()) {
+      for (auto it = enemyList.begin(); it != enemyList.end(); ++it) {
+         (*it)->draw();
+      }
+   }
+}
+
 void Window::loadSprites()
 {
-   
-   color= al_map_rgb(0, 200, 0);
-
-   createThreads();
 
    // represents the middle of the image width-wise, and top height-wise
    bgMid = Point(0, 0);
@@ -195,18 +213,49 @@ void Window::loadSprites()
    bg = std::make_shared<Sprite> ("BGstars.png"); //fundo da tela - background
    // delete path 
    al_destroy_path(path);
-   
 
 }
 
+void Window::spawEnemys() {
+
+   if (_EnemyTimer->getCount() > ORDER_ENEMYS_DELAY) {
+      
+      int cases = rand() % 1;
+
+      Vector enemySpeed(-180, 0);
+
+      switch (cases)
+      {
+      case 0: // V wave
+         enemyList.push_back(std::make_shared<EnemyPurple> (Point(1200, 300), al_map_rgb(246, 64, 234), enemySpeed, &dt));
+         enemyList.push_back(std::make_shared<EnemyPurple> (Point(1300, 350), al_map_rgb(246, 64, 234), enemySpeed, &dt));
+         enemyList.push_back(std::make_shared<EnemyPurple> (Point(1300, 250), al_map_rgb(246, 64, 234), enemySpeed, &dt));
+         enemyList.push_back(std::make_shared<EnemyPurple> (Point(1400, 400), al_map_rgb(246, 64, 234), enemySpeed, &dt));
+         enemyList.push_back(std::make_shared<EnemyPurple> (Point(1400, 200), al_map_rgb(246, 64, 234), enemySpeed, &dt));
+         enemyList.push_back(std::make_shared<EnemyPurple> (Point(1500, 100), al_map_rgb(246, 64, 234), enemySpeed, &dt));
+         enemyList.push_back(std::make_shared<EnemyPurple> (Point(1500, 500), al_map_rgb(246, 64, 234), enemySpeed, &dt)); 
+           
+         break;
+
+      default:
+         break;
+      }
+
+      _EnemyTimer->srsTimer();
+   }
+}
+
 void Window::addLaser(const Point& cen, const ALLEGRO_COLOR& col, const Vector& spd) {
-   laserList.push_back(Laser(cen, col, spd));
+   if (_WeaponTimer->getCount() > WEAPON_DELAY_LASER_VERSUS) {
+      laserList.push_back(Laser(cen, col, spd));
+      _WeaponTimer->srsTimer();
+   }
 }
 
 void Window::createThreads() {
 
    // Create Ship
-   ship = new Ship(&_finish);
+   ship = new Ship(&_finish, &dt);
    shipThread = new Thread(runShip, ship);
 
    // Create Controller
@@ -216,6 +265,9 @@ void Window::createThreads() {
    // Create Laser
    laserThread = new Thread(runLaser, &laserList, &_finish);
 
+   // Create Enemys
+   enemyThread = new Thread(runEnemys, &enemyList, &_finish);
+
 }
 
 void Window::deleteThreads() {
@@ -223,10 +275,13 @@ void Window::deleteThreads() {
    shipThread->join();
    controllerThread->join();
    laserThread->join();
+   enemyThread->join();
 
    delete shipThread;
    delete controller;
    delete laserThread;
+   delete enemyThread;
+
 }
 
 void Window::runShip(Ship * ship) {
@@ -256,14 +311,36 @@ void Window::runLaser(std::list<Laser> *laserVector, bool * finish) {
                newLaserVector.push_back(*it);
             }	 
          }
-            laserVector->clear();
-            laserVector->assign(newLaserVector.begin(), newLaserVector.end());
+         laserVector->clear();
+         laserVector->assign(newLaserVector.begin(), newLaserVector.end());
          }
       Thread::yield();
       }
 
    Thread::running()->thread_exit(0);
 
+   }
+
+   void Window::runEnemys(std::list< std::shared_ptr<EnemyPurple> > *enemyList, bool * finish) {
+
+      while(!*finish) {
+
+         if (!enemyList->empty()) {
+            for (auto it = enemyList->begin();
+            it != enemyList->end(); ++it) {
+               (*it)->update();
+            }
+            std::list< std::shared_ptr<EnemyPurple> > newEnemyList;
+            for (auto it = enemyList->begin(); it != enemyList->end(); ++it) {
+               if (!(*it)->dead) {
+                  newEnemyList.push_back(*it);
+               }
+            }
+            }
+         Thread::yield();
+      }
+      
+      Thread::running()->thread_exit(0);
    }
 
 

@@ -16,10 +16,11 @@
 
 __BEGIN_API
 
-Ship::Ship(bool *finish)
+Ship::Ship(bool *finish, float *dt)
 {
    centre = Point(215, 245);
    _finish = finish;
+   _dt = dt;
 
     // Go to resources directory
    ALLEGRO_PATH *path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
@@ -38,7 +39,7 @@ void Ship::run() {
    while (!*_finish)
    {
       _crtTime = al_current_time();
-      centre = centre + speed * (_crtTime - _prevTime);
+      centre = centre + speed * (*_dt);
       selectShipAnimation();
       _prevTime = _crtTime;
       speed = Vector(0, 0);
