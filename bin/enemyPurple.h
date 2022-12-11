@@ -1,64 +1,70 @@
 /**
- * @file Creep.h
- * @brief derived class of Enemy
+ * @file enemyPurple.h
  *
  * @author
  * @bug
  **/
 
-#ifndef CREEP_H
-#define CREEP_H
+#ifndef ENEMYPURPLE_H
+#define ENEMYPURPLE_H
 
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro.h>
 #include <memory>
 #include <string>
-
-#include "Sprite.h"
-#include "Vector.h"
 #include "Action.h"
 #include "traits.h"
 #include "thread.h"
 #include "semaphore.h"
+#include "Point.h"
+#include "Vector.h"
+#include "Timer.h"
+#include "Sprite.h"
+#include "Laser.h"
 
-struct Point;
-struct Vector;
-class Timer;
-class Sprite;
+__BEGIN_API
 
-extern const int CREEP_SIZE;
+class EnemyPurple
+{
 
-class EnemyPurple {
-	
-    public:
-
-    EnemyPurple(Point p, ALLEGRO_COLOR c, Vector s , float *dt);
+public:
+    EnemyPurple(Point p, Vector s, float *dt, bool *finish);
     ~EnemyPurple();
-    
+
     Point centre;
     ALLEGRO_COLOR color;
     Vector speed;
     bool dead = false;
+    int size;
+    std::list<Laser> lasers;
+
+    static void runEnemies(std::list<std::shared_ptr<EnemyPurple>> *enemyList, bool *finish);
 
     void update();
     void load_assets();
+    void loadSprite();
     void deathAnim();
     void hit();
     void draw();
+    void drawLaser();
+    void fire();
 
-    private:
-    std::shared_ptr<Timer> fireDelay;   
+private:
+    std::shared_ptr<Timer> fireDelay;
     std::shared_ptr<Sprite> enemySprite;
     std::shared_ptr<Sprite> deathSprite;
+    std::shared_ptr<Timer> _fireTimer;
+    Thread * lasersThread;
     Vector projSpeed;
     int fireSpeed;
     int lives;
-    int dAnim;   
+    int dAnim;
     bool dAnim_complete;
-    bool fire;
-    float _crtTime = 0;
-    float _prevTime = 0;
     float *_dt;
+    bool * _finish;
 };
+
+
+__END_API
 
 #endif

@@ -16,13 +16,18 @@
 
 __BEGIN_API
 
+#define WEAPON_DELAY_LASER_VERSUS 10
+
 Ship::Ship(bool *finish, float *dt)
 {
    centre = Point(215, 245);
    _finish = finish;
    _dt = dt;
 
-    // Go to resources directory
+   // Create Laser
+   lasersThread = new Thread(Laser::runLaser, &lasers, _finish);
+
+   // Go to resources directory
    ALLEGRO_PATH *path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
    al_append_path_component(path, "resources");
    al_change_directory(al_path_cstr(path, '/'));
@@ -38,15 +43,17 @@ void Ship::run() {
    
    while (!*_finish)
    {
-      _crtTime = al_current_time();
       centre = centre + speed * (*_dt);
       selectShipAnimation();
-      _prevTime = _crtTime;
       speed = Vector(0, 0);
       checkBoundary();
 
       Thread::yield();
    }
+
+   lasersThread->join();
+   delete lasersThread;
+
    Thread::running()->thread_exit(0);
     
 }
@@ -55,6 +62,18 @@ void Ship::draw() {
 
    shipSprite->draw_region(row, col, 47.0, 40.0, centre, 0);
 
+}
+
+void Ship::drawLaser()
+{
+   if (!lasers.empty())
+   {
+      for (std::list<Laser>::iterator it = lasers.begin();
+           it != lasers.end(); ++it)
+      {
+         it->draw();
+      }
+   }
 }
 
 void Ship::selectShipAnimation() {
@@ -92,5 +111,8 @@ void Ship::putY(int y) {
     speed.y += y;
 }
 
+void Ship::fire() {
+   lasers.push_back(Laser(centre, al_map_rgb(200, 0, 0), Vector(500, 0)));
+}
 
 __END_API

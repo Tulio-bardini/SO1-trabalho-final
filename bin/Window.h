@@ -8,7 +8,14 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <allegro5/allegro.h>
+#include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
+#include <stdexcept>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -25,7 +32,7 @@
 #include "Laser.h"
 #include "Timer.h"
 #include "enemyPurple.h"
-
+#include "colider.h"
 
 __BEGIN_API
 
@@ -44,13 +51,12 @@ class Window {
    void draw();
    void update();
 
-   void addLaser(const Point& cen, const ALLEGRO_COLOR& col, const Vector& spd);
+   void fire();
    void spawEnemys();
 
    void gameLoop(float& prevTime);
 
    void drawBackground();
-   void drawLaser();
    void drawEnemys();
 
    // Threads
@@ -70,13 +76,11 @@ class Window {
    //Static Functions
    static void runShip(Ship * ship);
    static void runController(Controller * controller);
-   static void runLaser(std::list<Laser> *laserVector,  bool * finish);
-   static void runEnemys(std::list< std::shared_ptr<EnemyPurple> > *enemyList, bool * finish);
+   static void runColider(Colider *colider);
 
   private:
    void loadSprites();
    //Checks data sprites
-   std::list<Laser> laserList;
    std::list< std::shared_ptr<EnemyPurple> > enemyList; 
    std::shared_ptr<Timer> _WeaponTimer;
    std::shared_ptr<Timer> _EnemyTimer;
@@ -94,7 +98,6 @@ class Window {
    Vector fgSpeed;
    std::shared_ptr<Sprite> bg;/**<shared pointer to background animation */
    std::shared_ptr<Sprite> fg;
-   
 
    //ship
    Ship * ship;
@@ -104,8 +107,9 @@ class Window {
    Controller * controller;
    Thread * controllerThread;
 
-   //laser
-   Thread * laserThread;
+   //colider
+   Colider * colider;
+   Thread * coliderThread;
 
    //enemys
    Thread * enemyThread;
