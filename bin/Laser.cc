@@ -9,12 +9,13 @@
 
 __BEGIN_API
 
-Laser::Laser(Point p, ALLEGRO_COLOR c, Vector s)
+Laser::Laser(Point p, ALLEGRO_COLOR c, float *dt, Vector s)
 {
    centre = p;
    speed = s;
    color = c;
    live = true;
+   _dt = dt;
 }
 
 Laser::~Laser() {
@@ -22,7 +23,7 @@ Laser::~Laser() {
 }
 
 void Laser::update() {
-   centre = centre + speed * 0.02;
+   centre = centre + speed * (*_dt);
    if (!in_bound())
       live = false;
 }

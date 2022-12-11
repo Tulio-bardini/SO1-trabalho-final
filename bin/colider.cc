@@ -18,12 +18,14 @@
 
 __BEGIN_API
 
-Colider::Colider(Ship *ship, std::list<std::shared_ptr<EnemyPurple>> *enemies, std::list<Laser> *lasers, bool *finish)
+Colider::Colider(Ship *ship, std::list<std::shared_ptr<EnemyPurple>> *enemies, 
+                std::list<Laser> *lasers, std::list< std::shared_ptr<Mine> > *mines, bool *finish)
 {
     _ship = ship;
     _enemies = enemies;
     _finish = finish;
     _lasers = lasers;
+    _mines = mines;
 }
 
 Colider::~Colider()
@@ -35,10 +37,47 @@ void Colider::run() {
     {
         checkCollisionOnEnemies();
         checkCollisionOnPlayer();
+        checkCollisionOnMines();
         Thread::yield();
     }
 
     Thread::running()->thread_exit(0);
+}
+
+void Colider::checkCollisionOnMines() {
+
+    if (!_ship->lasers.empty() && !_mines->empty() && _ship)
+    {
+        for (std::list<Laser>::iterator it_laser = _ship->lasers.begin();
+             it_laser != _ship->lasers.end(); ++it_laser)
+        {
+
+            Point pt_laser = it_laser->centre;
+            for (std::list< std::shared_ptr<Mine> >::iterator it_mine =
+                     _mines->begin();
+                 it_mine != _mines->end(); ++it_mine)
+            {
+
+                // set bounding points
+                Point pt_mine = (*it_mine)->centre;
+                int mine_size = (*it_mine)->size;
+
+                if (!(*it_mine)->dead){
+                    // check for collision
+                    if ((pt_laser.x > pt_mine.x - mine_size) &&
+                        (pt_laser.x < pt_mine.x + mine_size) &&
+                        (pt_laser.y > pt_mine.y - mine_size) &&
+                        (pt_laser.y < pt_mine.y + mine_size))
+                    {
+                        // register damage on enemy and flag projectile as dead
+                        it_laser->live = false;
+                        (*it_mine)->hit(1);
+                    }
+                }
+            }
+        }
+
+    }
 }
 
 void Colider::checkCollisionOnEnemies()
@@ -120,7 +159,27 @@ void Colider::checkCollisionOnPlayer() {
                     _ship->hit(1);
                 }
             }
-            
+        }
+
+        for (std::list< std::shared_ptr<Mine> >::iterator it_mine =
+                     _mines->begin();
+                 it_mine != _mines->end(); ++it_mine)
+        {
+            int mine_size = (*it_mine)->size;
+            if (!(*it_mine)->dead) {
+                if (((_ship->centre.x + _ship->size > (*it_mine)->centre.x - mine_size) &&
+                (_ship->centre.x + _ship->size < (*it_mine)->centre.x + mine_size) &&
+                (_ship->centre.y + _ship->size > (*it_mine)->centre.y - mine_size) &&
+                (_ship->centre.y + _ship->size < (*it_mine)->centre.y + mine_size)) ||
+                ((_ship->centre.x - _ship->size > (*it_mine)->centre.x - mine_size) &&
+                (_ship->centre.x - _ship->size < (*it_mine)->centre.x + mine_size) &&
+                (_ship->centre.y - _ship->size > (*it_mine)->centre.y - mine_size) &&
+                (_ship->centre.y - _ship->size < (*it_mine)->centre.y + mine_size)))
+                {
+                    (*it_mine)->explode();
+                    _ship->hit(1);
+                }
+            }
         }
 
         

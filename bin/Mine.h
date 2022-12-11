@@ -28,7 +28,7 @@ class Mine
 {
 
 public:
-    Mine( float *dt, bool *finish);
+    Mine( float *dt, std::list<Laser> *lasers, bool *finish);
     ~Mine();
 
     Point centre;
@@ -43,10 +43,8 @@ public:
 
     void update();
     void loadSprite();
-    void deathAnim();
-    void hit();
+    void hit(int damage);
     void draw();
-    void drawLaser();
     void explode();
 
     static void runMine(std::list<std::shared_ptr<Mine>> *mines, bool *finish);
@@ -54,10 +52,11 @@ public:
 private:
     std::shared_ptr<Timer> _explodeTimer;
     std::shared_ptr<Sprite> mineSprite;
-    Thread * lasersThread;
-    Vector projSpeed;
+    std::list<Laser> * _lasers;
     bool * _finish;
     float *_dt;
+    bool death = false;
+    bool exploded = false;
 };
 
 

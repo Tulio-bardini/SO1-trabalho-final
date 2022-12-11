@@ -24,7 +24,7 @@ __BEGIN_API
 
 class Laser {
   public:
-    Laser(Point p, ALLEGRO_COLOR c, Vector s);   
+    Laser(Point p, ALLEGRO_COLOR c, float *dt, Vector s);   
     ~Laser();
 
     Point centre;
@@ -35,6 +35,7 @@ class Laser {
     void update();
     void draw();
     Vector speed;
+    float *_dt;
 
     private:
     bool in_bound();

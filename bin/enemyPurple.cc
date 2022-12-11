@@ -86,8 +86,8 @@ void EnemyPurple::loadSprite()
 
 void EnemyPurple::fire()
 {
-    _lasers->push_back(Laser(centre, color, Vector(-230, 50)));
-    _lasers->push_back(Laser(centre, color, Vector(-230, -50)));
+    _lasers->push_back(Laser(centre, color, _dt, Vector(-230, 50)));
+    _lasers->push_back(Laser(centre, color, _dt, Vector(-230, -50)));
 }
 
 

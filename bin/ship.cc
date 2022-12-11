@@ -113,7 +113,7 @@ void Ship::putY(int y) {
 }
 
 void Ship::fire() {
-   lasers.push_back(Laser(centre, al_map_rgb(20, 200, 20), Vector(500, 0)));
+   lasers.push_back(Laser(centre, al_map_rgb(20, 200, 20), _dt, Vector(500, 0)));
 }
 
 void Ship::hit(int damage) {

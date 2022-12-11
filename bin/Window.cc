@@ -4,6 +4,7 @@ __BEGIN_API
 
 #define WEAPON_DELAY_LASER_VERSUS 10
 #define ORDER_ENEMYS_DELAY 200
+#define MINE_DELAY 160
 
 Window::Window(int w, int h, int fps) : _displayWidth(w), _displayHeight(h),
                                         _fps(fps),
@@ -121,6 +122,7 @@ void Window::gameLoop(float &prevTime)
    prevTime = crtTime;
 
    spawEnemys();
+   spawMine();
 
    // timer
    if (event.type == ALLEGRO_EVENT_TIMER)
@@ -159,6 +161,7 @@ void Window::draw()
    drawBackground();
    drawEnemies();
    drawLasers();
+   drawMine();
    ship->draw();
    ship->drawLaser();
 }
@@ -173,6 +176,17 @@ void Window::drawEnemies()
    if (!enemyList.empty())
    {
       for (auto it = enemyList.begin(); it != enemyList.end(); ++it)
+      {
+         (*it)->draw();
+      }
+   }
+}
+
+void Window::drawMine()
+{
+   if (!mines.empty())
+   {
+      for (auto it = mines.begin(); it != mines.end(); ++it)
       {
          (*it)->draw();
       }
@@ -249,6 +263,15 @@ void Window::spawEnemys()
    }
 }
 
+void Window::spawMine()
+{
+   if (_MineTimer->getCount() > MINE_DELAY) {
+      mines.push_back(std::make_shared<Mine> (&dt, &enemyLasers, &_finish));
+      _MineTimer->srsTimer();
+   }
+
+}
+
 void Window::fire()
 {
    if (_WeaponTimer->getCount() > WEAPON_DELAY_LASER_VERSUS)
@@ -268,7 +291,7 @@ void Window::createThreads()
    controller = new Controller(&_finish, ship);
    controllerThread = new Thread(runController, controller);
 
-   colider = new Colider(ship, &enemyList, &enemyLasers, &_finish);
+   colider = new Colider(ship, &enemyList, &enemyLasers, &mines, &_finish);
    coliderThread = new Thread(runColider, colider);
 
    // Create Enemys
@@ -276,6 +299,9 @@ void Window::createThreads()
 
    // Laser Thread
    enemyLasersThread = new Thread(Laser::runLaser, &enemyLasers, &_finish);
+
+   // Mines Thread
+   mineThread = new Thread(Mine::runMine, &mines, &_finish);
 }
 
 void Window::deleteThreads()
@@ -301,6 +327,9 @@ void Window::setTimers() {
    _EnemyTimer = std::make_shared<Timer>(_fps);
    _EnemyTimer->create();
    _EnemyTimer->startTimer();
+   _MineTimer = std::make_shared<Timer>(_fps);
+   _MineTimer->create();
+   _MineTimer->startTimer();
 }
 
 void Window::runShip(Ship *ship)
