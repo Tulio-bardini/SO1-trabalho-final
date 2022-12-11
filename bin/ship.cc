@@ -16,7 +16,7 @@
 
 __BEGIN_API
 
-#define WEAPON_DELAY_LASER_VERSUS 10
+#define MAX_LIFE 3
 
 Ship::Ship(bool *finish, float *dt)
 {
@@ -61,6 +61,7 @@ void Ship::run() {
 void Ship::draw() {
 
    shipSprite->draw_region(row, col, 47.0, 40.0, centre, 0);
+   drawLife();
 
 }
 
@@ -112,7 +113,31 @@ void Ship::putY(int y) {
 }
 
 void Ship::fire() {
-   lasers.push_back(Laser(centre, al_map_rgb(200, 0, 0), Vector(500, 0)));
+   lasers.push_back(Laser(centre, al_map_rgb(20, 200, 20), Vector(500, 0)));
+}
+
+void Ship::hit(int damage) {
+   life = life - damage;
+   if (life < 1) {
+      if (lifeRestart > 0) {
+         life = 3;
+         lifeRestart -= 1;
+      }
+      else {
+         dead = true;
+      }
+   }
+}
+
+void Ship::drawLife() {
+   if (!dead) {
+      al_draw_line(centre.x - size*2, centre.y + size*2,
+		(centre.x - 2*size) + (life) * (size*1.3),
+		centre.y + size*2,
+		al_map_rgb(255 * (1.0 - life / MAX_LIFE),
+			   200 * (life / MAX_LIFE),
+			   0), 5);
+   }
 }
 
 __END_API

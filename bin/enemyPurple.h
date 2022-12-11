@@ -28,7 +28,7 @@ class EnemyPurple
 {
 
 public:
-    EnemyPurple(Point p, Vector s, float *dt, bool *finish);
+    EnemyPurple(Point p, Vector s, std::list<Laser> *lasers, float *dt, bool *finish);
     ~EnemyPurple();
 
     Point centre;
@@ -36,7 +36,6 @@ public:
     Vector speed;
     bool dead = false;
     int size;
-    std::list<Laser> lasers;
 
     static void runEnemies(std::list<std::shared_ptr<EnemyPurple>> *enemyList, bool *finish);
 
@@ -46,7 +45,6 @@ public:
     void deathAnim();
     void hit();
     void draw();
-    void drawLaser();
     void fire();
 
 private:
@@ -54,16 +52,16 @@ private:
     std::shared_ptr<Sprite> enemySprite;
     std::shared_ptr<Sprite> deathSprite;
     std::shared_ptr<Timer> _fireTimer;
-    Thread * lasersThread;
+    std::list<Laser> * _lasers;
     Vector projSpeed;
     int fireSpeed;
     int lives;
     int dAnim;
     bool dAnim_complete;
     float *_dt;
-    bool * _finish;
+    bool *_finish;
+    
 };
-
 
 __END_API
 

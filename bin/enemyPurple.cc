@@ -11,7 +11,7 @@ __BEGIN_API
 
 #define EnemyPurple_SIZE 20
 
-EnemyPurple::EnemyPurple(Point cen, Vector spd, float *dt, bool *finish)
+EnemyPurple::EnemyPurple(Point cen, Vector spd, std::list<Laser> *lasers, float *dt, bool *finish)
 {
     speed = spd;
     color = al_map_rgb(246, 64, 234);
@@ -19,12 +19,13 @@ EnemyPurple::EnemyPurple(Point cen, Vector spd, float *dt, bool *finish)
     _dt = dt;
     size = EnemyPurple_SIZE;
     _finish = finish;
+    _lasers = lasers;
 
     _fireTimer = std::make_shared<Timer>(60);
     _fireTimer->create();
     _fireTimer->startTimer();
 
-    lasersThread = new Thread(Laser::runLaser, &lasers, _finish);
+    //lasersThread = new Thread(Laser::runLaser, &lasers, _finish);
 
     loadSprite();
     load_assets();
@@ -52,7 +53,6 @@ void EnemyPurple::hit()
 // draw image to display of enemy ship
 void EnemyPurple::draw()
 {
-    drawLaser();
     if (!dead)
     {
         enemySprite->draw_tinted(centre, color, 0);
@@ -67,18 +67,6 @@ void EnemyPurple::draw()
     }
 }
 
-void EnemyPurple::drawLaser()
-{
-    if (!lasers.empty())
-    {
-        
-        for (std::list<Laser>::iterator it = lasers.begin();
-            it != lasers.end(); ++it)
-        {
-            it->draw();
-        }
-    }
-}
 
 void EnemyPurple::deathAnim()
 {
@@ -86,7 +74,8 @@ void EnemyPurple::deathAnim()
     dAnim++; // move forward to the next frame of the animation for the next call
 }
 
-void EnemyPurple::loadSprite() {
+void EnemyPurple::loadSprite()
+{
     ALLEGRO_PATH *path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
     al_append_path_component(path, "resources");
     al_change_directory(al_path_cstr(path, '/'));
@@ -97,9 +86,10 @@ void EnemyPurple::loadSprite() {
 
 void EnemyPurple::fire()
 {
-    lasers.push_back(Laser(centre, color, Vector(-230, 50)));
-    lasers.push_back(Laser(centre, color, Vector(-230, -50)));
+    _lasers->push_back(Laser(centre, color, Vector(-230, 50)));
+    _lasers->push_back(Laser(centre, color, Vector(-230, -50)));
 }
+
 
 // update position of enemy ships
 void EnemyPurple::update()
@@ -112,12 +102,12 @@ void EnemyPurple::update()
         dead = true;
     }
 
-    if (_fireTimer->getCount() > 200 && !dead) {
+    if (_fireTimer->getCount() > 200 && !dead)
+    {
         fire();
         _fireTimer->srsTimer();
     }
 
-    // check y bound and adjust if out
     if (centre.y > 600 - EnemyPurple_SIZE && speed.y > 0)
         speed.reflectY();
     if (centre.y < 0 - EnemyPurple_SIZE && speed.y < 0)
@@ -126,31 +116,24 @@ void EnemyPurple::update()
 
 void EnemyPurple::runEnemies(std::list<std::shared_ptr<EnemyPurple>> *enemyList, bool *finish)
 {
-   while (!*finish)
-   {
+    while (!*finish)
+    {
 
-      if (!enemyList->empty())
-      {
-         for (auto it = enemyList->begin();
-              it != enemyList->end(); ++it)
-         {
-            (*it)->update();
-         }
-         std::list<std::shared_ptr<EnemyPurple>> newEnemyList;
-         for (auto it = enemyList->begin(); it != enemyList->end(); ++it)
-         {
-            if (!(*it)->dead)
+        if (!enemyList->empty())
+        {
+            for (auto it = enemyList->begin();
+                 it != enemyList->end(); ++it)
             {
-               newEnemyList.push_back(*it);
+                if (!(*it)->dead)
+                {
+                    (*it)->update();
+                }
             }
-         }
-      }
-      Thread::yield();
-   }
+        }
+        Thread::yield();
+    }
 
-   Thread::running()->thread_exit(0);
+    Thread::running()->thread_exit(0);
 }
-
-
 
 __END_API

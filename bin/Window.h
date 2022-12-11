@@ -33,6 +33,7 @@
 #include "Timer.h"
 #include "enemyPurple.h"
 #include "colider.h"
+#include "Mine.h"
 
 __BEGIN_API
 
@@ -50,14 +51,18 @@ class Window {
    void run();
    void draw();
    void update();
+   void setTimers();
 
    void fire();
    void spawEnemys();
+   void spawMine();
 
    void gameLoop(float& prevTime);
 
    void drawBackground();
-   void drawEnemys();
+   void drawEnemies();
+   void drawMine();
+   void drawLasers();
 
    // Threads
    void createThreads();
@@ -78,12 +83,17 @@ class Window {
    static void runController(Controller * controller);
    static void runColider(Colider *colider);
 
+   std::list<Laser> enemyLasers;
+
   private:
    void loadSprites();
    //Checks data sprites
-   std::list< std::shared_ptr<EnemyPurple> > enemyList; 
+   std::list< std::shared_ptr<EnemyPurple> > enemyList;
+   std::list< std::shared_ptr<Mine> > mines;
    std::shared_ptr<Timer> _WeaponTimer;
    std::shared_ptr<Timer> _EnemyTimer;
+   std::shared_ptr<Timer> _MineTimer;
+
    Point centre;        /**< ship position */
    ALLEGRO_COLOR color; /**< ship color */   
    Vector speed;        /**< movement speed in any direction */
@@ -111,8 +121,14 @@ class Window {
    Colider * colider;
    Thread * coliderThread;
 
+   //mine
+   Thread * mineThread;
+
    //enemys
    Thread * enemyThread;
+
+   // Enemies Lasers
+   Thread * enemyLasersThread;
 
    // general game variables
    int _displayWidth;
@@ -130,6 +146,6 @@ class Window {
    
 };
 
-
 __END_API
+
 #endif

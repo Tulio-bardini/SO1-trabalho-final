@@ -15,6 +15,8 @@
 
 __BEGIN_API
 
+#define SHIP_SIZE 16
+
 class Ship {
 
 public:
@@ -25,13 +27,19 @@ public:
     void putY(int y);
     void draw();
     void drawLaser();
+    void drawLife();
     void fire();
+    void hit(int damage);
 
     std::list<Laser> lasers;
     std::shared_ptr<Sprite> shipSprite;
     Point centre;
     int row; /**<row of animation to be played */
     int col; /**< column of animation to be played */
+    int size = SHIP_SIZE;
+    bool dead = false;
+    int life = 3;
+    int lifeRestart = 2;
 
 private:
     void selectShipAnimation();
@@ -41,7 +49,6 @@ private:
     Vector speed;
     bool *_finish;
     float *_dt;
-    // general game variables
 
 };
 

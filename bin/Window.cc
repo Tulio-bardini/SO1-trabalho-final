@@ -68,13 +68,7 @@ void Window::init()
    dt = crtTime - prevTime;
    prevTime = crtTime;
 
-   // Start timers
-   _WeaponTimer = std::make_shared<Timer>(_fps);
-   _WeaponTimer->create();
-   _WeaponTimer->startTimer();
-   _EnemyTimer = std::make_shared<Timer>(_fps);
-   _EnemyTimer->create();
-   _EnemyTimer->startTimer();
+   setTimers();
 
    // register keyboard
    al_register_event_source(_eventQueue, al_get_keyboard_event_source());
@@ -163,7 +157,8 @@ void Window::update()
 void Window::draw()
 {
    drawBackground();
-   drawEnemys();
+   drawEnemies();
+   drawLasers();
    ship->draw();
    ship->drawLaser();
 }
@@ -173,7 +168,7 @@ void Window::drawBackground()
    bg->draw_parallax_background(bgMid.x, 0);
 }
 
-void Window::drawEnemys()
+void Window::drawEnemies()
 {
    if (!enemyList.empty())
    {
@@ -182,6 +177,18 @@ void Window::drawEnemys()
          (*it)->draw();
       }
    }
+}
+
+void Window::drawLasers()
+{
+   if (!enemyLasers.empty())
+    {
+        for (std::list<Laser>::iterator it = enemyLasers.begin();
+             it != enemyLasers.end(); ++it)
+        {
+            it->draw();
+        }
+    }
 }
 
 void Window::loadSprites()
@@ -218,19 +225,19 @@ void Window::spawEnemys()
       {
       case 0: // V wave
          enemyList.push_back(std::make_shared<EnemyPurple>(Point(1200, 300),
-            enemySpeed, &dt, &_finish));
+            enemySpeed, &enemyLasers, &dt, &_finish));
          enemyList.push_back(std::make_shared<EnemyPurple>(Point(1300, 350),
-            enemySpeed, &dt, &_finish));
+            enemySpeed, &enemyLasers, &dt, &_finish));
          enemyList.push_back(std::make_shared<EnemyPurple>(Point(1300, 250),
-            enemySpeed, &dt, &_finish));
+            enemySpeed, &enemyLasers, &dt, &_finish));
          enemyList.push_back(std::make_shared<EnemyPurple>(Point(1400, 400),
-            enemySpeed, &dt, &_finish));
+            enemySpeed, &enemyLasers, &dt, &_finish));
          enemyList.push_back(std::make_shared<EnemyPurple>(Point(1400, 200),
-            enemySpeed, &dt, &_finish));
+            enemySpeed, &enemyLasers, &dt, &_finish));
          enemyList.push_back(std::make_shared<EnemyPurple>(Point(1500, 100),
-            enemySpeed, &dt, &_finish));
+            enemySpeed, &enemyLasers, &dt, &_finish));
          enemyList.push_back(std::make_shared<EnemyPurple>(Point(1500, 500),
-            enemySpeed, &dt, &_finish));
+            enemySpeed, &enemyLasers, &dt, &_finish));
 
          break;
 
@@ -261,11 +268,14 @@ void Window::createThreads()
    controller = new Controller(&_finish, ship);
    controllerThread = new Thread(runController, controller);
 
-   colider = new Colider(ship, &enemyList, &_finish);
+   colider = new Colider(ship, &enemyList, &enemyLasers, &_finish);
    coliderThread = new Thread(runColider, colider);
 
    // Create Enemys
    enemyThread = new Thread(EnemyPurple::runEnemies, &enemyList, &_finish);
+
+   // Laser Thread
+   enemyLasersThread = new Thread(Laser::runLaser, &enemyLasers, &_finish);
 }
 
 void Window::deleteThreads()
@@ -274,11 +284,23 @@ void Window::deleteThreads()
    controllerThread->join();
    enemyThread->join();
    coliderThread->join();
+   enemyLasersThread->join();
 
    delete shipThread;
    delete controller;
    delete enemyThread;
    delete coliderThread;
+   delete enemyLasersThread;
+}
+
+void Window::setTimers() {
+   // Start timers
+   _WeaponTimer = std::make_shared<Timer>(_fps);
+   _WeaponTimer->create();
+   _WeaponTimer->startTimer();
+   _EnemyTimer = std::make_shared<Timer>(_fps);
+   _EnemyTimer->create();
+   _EnemyTimer->startTimer();
 }
 
 void Window::runShip(Ship *ship)

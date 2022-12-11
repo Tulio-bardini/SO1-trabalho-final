@@ -21,14 +21,16 @@ class Colider
 {
 
 public:
-    Colider(Ship *ship, std::list<std::shared_ptr<EnemyPurple>> *enemies, bool *finish);
+    Colider(Ship *ship, std::list<std::shared_ptr<EnemyPurple>> *enemies, std::list<Laser> *lasers, bool *finish);
     ~Colider();
     void run();
     void checkCollisionOnEnemies();
+    void checkCollisionOnPlayer();
 
 private:
     Ship *_ship;
     std::list<std::shared_ptr<EnemyPurple>> *_enemies;
+    std::list<Laser> *_lasers;
     bool *_finish;
 };
 
