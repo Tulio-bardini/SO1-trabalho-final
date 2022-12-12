@@ -9,13 +9,14 @@
 
 __BEGIN_API
 
-Laser::Laser(Point p, ALLEGRO_COLOR c, float *dt, Vector s)
+Laser::Laser(Point p, ALLEGRO_COLOR c, int owner, float *dt, Vector s)
 {
    centre = p;
    speed = s;
    color = c;
    live = true;
    _dt = dt;
+   classOwner = owner;
 }
 
 Laser::~Laser() {

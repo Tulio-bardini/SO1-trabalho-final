@@ -10,12 +10,13 @@
 __BEGIN_API
 
 #define MINE_SIZE 20
+#define TypeClassNumber 2
 
 Mine::Mine(float *dt, std::list<Laser> *lasers, bool * finish)
 {
     speed = Vector(-80, 0);
     _dt = dt;
-    centre = Point(800, 300);
+    centre.rollRandom();
     _finish = finish;
     _lasers = lasers;
     size = MINE_SIZE;
@@ -70,19 +71,19 @@ void Mine::explode()
     dead = true;
 
     // right side
-    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), _dt, Vector(112, 37)));
-    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), _dt, Vector(75, 75)));
-    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), _dt, Vector(37, 112)));
-    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), _dt, Vector(-112, 37)));
-    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), _dt, Vector(-75, 75)));
-    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), _dt, Vector(-37, 112)));
+    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), TypeClassNumber, _dt, Vector(112, 37)));
+    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), TypeClassNumber, _dt, Vector(75, 75)));
+    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), TypeClassNumber, _dt, Vector(37, 112)));
+    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), TypeClassNumber, _dt, Vector(-112, 37)));
+    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), TypeClassNumber, _dt, Vector(-75, 75)));
+    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), TypeClassNumber, _dt, Vector(-37, 112)));
     // left side
-    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), _dt, Vector(112, -37)));
-    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), _dt, Vector(75, -75)));
-    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), _dt, Vector(37, -112)));
-    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), _dt, Vector(-112, -37)));
-    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), _dt, Vector(-75, -75)));
-    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), _dt, Vector(-37, -112)));
+    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), TypeClassNumber, _dt, Vector(112, -37)));
+    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), TypeClassNumber, _dt, Vector(75, -75)));
+    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), TypeClassNumber, _dt, Vector(37, -112)));
+    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), TypeClassNumber, _dt, Vector(-112, -37)));
+    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), TypeClassNumber, _dt, Vector(-75, -75)));
+    _lasers->push_back(Laser(centre, al_map_rgb(200, 0, 0), TypeClassNumber, _dt, Vector(-37, -112)));
 }
 
 void Mine::loadSprite()
@@ -107,7 +108,18 @@ void Mine::runMine(std::list<std::shared_ptr<Mine>> *mines, bool *finish)
                     (*it)->update();
                 }
             }
+            std::list<std::shared_ptr<Mine>> newMines;
+            for (auto it = mines->begin(); it != mines->end(); ++it)
+            {
+                if (!(*it)->dead)
+                {
+                    newMines.push_back(*it);
+                }
+            }
+            mines->clear();
+            mines->assign(newMines.begin(), newMines.end());
         }
+        
         Thread::yield();
     }
 

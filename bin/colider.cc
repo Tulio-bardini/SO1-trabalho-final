@@ -46,32 +46,34 @@ void Colider::run() {
 
 void Colider::checkCollisionOnMines() {
 
-    if (!_ship->lasers.empty() && !_mines->empty() && _ship)
+    if (!_lasers->empty() && !_mines->empty() && _ship)
     {
-        for (std::list<Laser>::iterator it_laser = _ship->lasers.begin();
-             it_laser != _ship->lasers.end(); ++it_laser)
+        for (std::list<Laser>::iterator it_laser = _lasers->begin();
+             it_laser != _lasers->end(); ++it_laser)
         {
 
-            Point pt_laser = it_laser->centre;
-            for (std::list< std::shared_ptr<Mine> >::iterator it_mine =
-                     _mines->begin();
-                 it_mine != _mines->end(); ++it_mine)
-            {
+            if (it_laser->classOwner == 1) {
+                Point pt_laser = it_laser->centre;
+                for (std::list< std::shared_ptr<Mine> >::iterator it_mine =
+                        _mines->begin();
+                    it_mine != _mines->end(); ++it_mine)
+                {
 
-                // set bounding points
-                Point pt_mine = (*it_mine)->centre;
-                int mine_size = (*it_mine)->size;
+                    // set bounding points
+                    Point pt_mine = (*it_mine)->centre;
+                    int mine_size = (*it_mine)->size;
 
-                if (!(*it_mine)->dead){
-                    // check for collision
-                    if ((pt_laser.x > pt_mine.x - mine_size) &&
-                        (pt_laser.x < pt_mine.x + mine_size) &&
-                        (pt_laser.y > pt_mine.y - mine_size) &&
-                        (pt_laser.y < pt_mine.y + mine_size))
-                    {
-                        // register damage on enemy and flag projectile as dead
-                        it_laser->live = false;
-                        (*it_mine)->hit(1);
+                    if (!(*it_mine)->dead){
+                        // check for collision
+                        if ((pt_laser.x > pt_mine.x - mine_size) &&
+                            (pt_laser.x < pt_mine.x + mine_size) &&
+                            (pt_laser.y > pt_mine.y - mine_size) &&
+                            (pt_laser.y < pt_mine.y + mine_size))
+                        {
+                            // register damage on enemy and flag projectile as dead
+                            it_laser->live = false;
+                            (*it_mine)->hit(1);
+                        }
                     }
                 }
             }
@@ -82,35 +84,36 @@ void Colider::checkCollisionOnMines() {
 
 void Colider::checkCollisionOnEnemies()
 {
-    if (!_ship->lasers.empty() && !_enemies->empty() && _ship)
+    if (!_lasers->empty() && !_enemies->empty() && _ship)
     {
-        for (std::list<Laser>::iterator it_laser = _ship->lasers.begin();
-             it_laser != _ship->lasers.end(); ++it_laser)
+        for (std::list<Laser>::iterator it_laser = _lasers->begin();
+             it_laser != _lasers->end(); ++it_laser)
         {
 
-            Point pt_laser = it_laser->centre;
-            for (std::list< std::shared_ptr<EnemyPurple> >::iterator it_enemP =
-                     _enemies->begin();
-                 it_enemP != _enemies->end(); ++it_enemP)
-            {
-
-                // set bounding points
-                Point pt_enemP = (*it_enemP)->centre;
-                int enem_sizeP = (*it_enemP)->size;
-
-                if (!(*it_enemP)->dead){
-                    // check for collision
-                    if ((pt_laser.x > pt_enemP.x - enem_sizeP) &&
-                        (pt_laser.x < pt_enemP.x + enem_sizeP) &&
-                        (pt_laser.y > pt_enemP.y - enem_sizeP) &&
-                        (pt_laser.y < pt_enemP.y + enem_sizeP))
-                    {
-                        // register damage on enemy and flag projectile as dead
-                        it_laser->live = false;
-                        (*it_enemP)->hit();
-                    }
-
+            if (it_laser->classOwner == 1) {
                     
+                Point pt_laser = it_laser->centre;
+                for (std::list< std::shared_ptr<EnemyPurple> >::iterator it_enemP =
+                        _enemies->begin();
+                    it_enemP != _enemies->end(); ++it_enemP)
+                {
+
+                    // set bounding points
+                    Point pt_enemP = (*it_enemP)->centre;
+                    int enem_sizeP = (*it_enemP)->size;
+
+                    if (!(*it_enemP)->dead){
+                        // check for collision
+                        if ((pt_laser.x > pt_enemP.x - enem_sizeP) &&
+                            (pt_laser.x < pt_enemP.x + enem_sizeP) &&
+                            (pt_laser.y > pt_enemP.y - enem_sizeP) &&
+                            (pt_laser.y < pt_enemP.y + enem_sizeP))
+                        {
+                            // register damage on enemy and flag projectile as dead
+                            it_laser->live = false;
+                            (*it_enemP)->hit();
+                        }   
+                    }
                 }
             }
         }
@@ -124,19 +127,21 @@ void Colider::checkCollisionOnPlayer() {
         for (std::list<Laser>::iterator it_laser = _lasers->begin();
              it_laser != _lasers->end(); ++it_laser)
         {
-            // set bounding points
-            Point pt_laser = it_laser->centre;
-            int player_size = _ship->size;
+            if (it_laser->classOwner == 2) {
+                // set bounding points
+                Point pt_laser = it_laser->centre;
+                int player_size = _ship->size;
 
-            // check for collision
-            if ((pt_laser.x > _ship->centre.x - player_size) &&
-                (pt_laser.x < _ship->centre.x + player_size) &&
-                (pt_laser.y > _ship->centre.y - player_size) &&
-                (pt_laser.y < _ship->centre.y + player_size))
-            {
-                // register damage on enemy and flag projectile as dead
-                it_laser->live = false;
-                _ship->hit(1);
+                // check for collision
+                if ((pt_laser.x > _ship->centre.x - player_size) &&
+                    (pt_laser.x < _ship->centre.x + player_size) &&
+                    (pt_laser.y > _ship->centre.y - player_size) &&
+                    (pt_laser.y < _ship->centre.y + player_size))
+                {
+                    // register damage on enemy and flag projectile as dead
+                    it_laser->live = false;
+                    _ship->hit(1);
+                }
             }
         }
 

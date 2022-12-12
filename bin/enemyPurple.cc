@@ -10,6 +10,7 @@
 __BEGIN_API
 
 #define EnemyPurple_SIZE 20
+#define TypeClassNumber 2
 
 EnemyPurple::EnemyPurple(Point cen, Vector spd, std::list<Laser> *lasers, float *dt, bool *finish)
 {
@@ -86,8 +87,8 @@ void EnemyPurple::loadSprite()
 
 void EnemyPurple::fire()
 {
-    _lasers->push_back(Laser(centre, color, _dt, Vector(-230, 50)));
-    _lasers->push_back(Laser(centre, color, _dt, Vector(-230, -50)));
+    _lasers->push_back(Laser(centre, color, TypeClassNumber, _dt, Vector(-230, 50)));
+    _lasers->push_back(Laser(centre, color, TypeClassNumber, _dt, Vector(-230, -50)));
 }
 
 
@@ -128,10 +129,10 @@ void EnemyPurple::runEnemies(std::list<std::shared_ptr<EnemyPurple>> *enemyList,
                     (*it)->update();
                 }
             }
-             std::list<std::shared_ptr<EnemyPurple>> newEnemyList;
+            std::list<std::shared_ptr<EnemyPurple>> newEnemyList;
             for (auto it = enemyList->begin(); it != enemyList->end(); ++it)
             {
-                if (!(*it)->dead)
+                if (!(*it)->dAnim_complete)
                 {
                     newEnemyList.push_back(*it);
                 }
