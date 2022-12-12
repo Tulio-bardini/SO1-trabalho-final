@@ -118,7 +118,6 @@ void EnemyPurple::runEnemies(std::list<std::shared_ptr<EnemyPurple>> *enemyList,
 {
     while (!*finish)
     {
-
         if (!enemyList->empty())
         {
             for (auto it = enemyList->begin();
@@ -129,10 +128,19 @@ void EnemyPurple::runEnemies(std::list<std::shared_ptr<EnemyPurple>> *enemyList,
                     (*it)->update();
                 }
             }
+             std::list<std::shared_ptr<EnemyPurple>> newEnemyList;
+            for (auto it = enemyList->begin(); it != enemyList->end(); ++it)
+            {
+                if (!(*it)->dead)
+                {
+                    newEnemyList.push_back(*it);
+                }
+            }
+            enemyList->clear();
+            enemyList->assign(newEnemyList.begin(), newEnemyList.end());
         }
         Thread::yield();
     }
-
     Thread::running()->thread_exit(0);
 }
 

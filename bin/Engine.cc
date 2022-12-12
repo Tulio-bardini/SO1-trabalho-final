@@ -190,8 +190,6 @@ void Engine::drawBackground() {
 }
 
 
-
-
 void Engine::selectShipAnimation() {
    if (speed.x > 0) {
       col = 1;
