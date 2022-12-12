@@ -48,6 +48,8 @@ class Window {
   public:
    Window(int w, int h, int fps);
    ~Window();
+
+   ALLEGRO_FONT* _font24 = NULL;
    
    void init();
    void run();
@@ -118,6 +120,7 @@ class Window {
    Vector fgSpeed;
    std::shared_ptr<Sprite> bg;/**<shared pointer to background animation */
    std::shared_ptr<Sprite> fg;
+   std::shared_ptr<Sprite> game_over;
 
    //ship
    Ship * ship;

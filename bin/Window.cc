@@ -6,7 +6,7 @@ __BEGIN_API
 #define ORDER_ENEMYS_DELAY 200
 #define MINE_DELAY 1000
 #define  MISSILE_DELAY_LASER_VERSUS 100
-#define BOSS_DELAY 1000
+#define BOSS_DELAY 6000
 
 Window::Window(int w, int h, int fps) : _displayWidth(w), _displayHeight(h),
                                         _fps(fps),
@@ -181,6 +181,9 @@ void Window::draw()
    drawMissile();
    ship->draw();
    boss->draw();
+   if (ship->dead) {
+      game_over->draw_region(0, 0, 552.0, 273.0, Point(150, 100), 0);
+   }
 }
 
 void Window::drawBackground()
@@ -248,6 +251,7 @@ void Window::loadSprites()
    al_change_directory(al_path_cstr(path, '/'));
    // sprites
 
+   game_over = std::make_shared<Sprite>("GameOver.png");
    bg = std::make_shared<Sprite>("BGstars.png"); // fundo da tela - background
    // delete path
    al_destroy_path(path);
@@ -259,29 +263,44 @@ void Window::spawEnemies()
    if (_EnemyTimer->getCount() > ORDER_ENEMYS_DELAY)
    {
 
-      int cases = rand() % 1;
+      int cases = rand() % 3;
 
       Vector enemySpeed(-180, 0);
+      Point pt_enemy;
 
       switch (cases)
       {
       case 0: // V wave
-         enemyList.push_back(std::make_shared<EnemyPurple>(Point(1200, 300),
+         enemyList.push_back(std::make_shared<EnemyPurple>(Point(1100, 300),
             enemySpeed, &lasers, &dt, &_finish));
-         enemyList.push_back(std::make_shared<EnemyPurple>(Point(1300, 350),
+         enemyList.push_back(std::make_shared<EnemyPurple>(Point(1200, 350),
             enemySpeed, &lasers, &dt, &_finish));
-         enemyList.push_back(std::make_shared<EnemyPurple>(Point(1300, 250),
+         enemyList.push_back(std::make_shared<EnemyPurple>(Point(1200, 250),
             enemySpeed, &lasers, &dt, &_finish));
-         enemyList.push_back(std::make_shared<EnemyPurple>(Point(1400, 400),
+         enemyList.push_back(std::make_shared<EnemyPurple>(Point(1300, 400),
             enemySpeed, &lasers, &dt, &_finish));
-         enemyList.push_back(std::make_shared<EnemyPurple>(Point(1400, 200),
+         enemyList.push_back(std::make_shared<EnemyPurple>(Point(1300, 200),
             enemySpeed, &lasers, &dt, &_finish));
-         enemyList.push_back(std::make_shared<EnemyPurple>(Point(1500, 100),
+         enemyList.push_back(std::make_shared<EnemyPurple>(Point(1400, 100),
             enemySpeed, &lasers, &dt, &_finish));
-         enemyList.push_back(std::make_shared<EnemyPurple>(Point(1500, 500),
+         enemyList.push_back(std::make_shared<EnemyPurple>(Point(1400, 500),
             enemySpeed, &lasers, &dt, &_finish));
 
          break;
+
+      case 1:
+
+         for (int i = 50; i < 300; i+= 50) {   
+            enemyList.push_back(std::make_shared<EnemyPurple>(Point(1200, i),
+            enemySpeed, &lasers, &dt, &_finish));
+         }
+
+      case 2:
+
+         for (int i = 350; i < 600; i+= 50) {   
+            enemyList.push_back(std::make_shared<EnemyPurple>(Point(1200, i),
+            enemySpeed, &lasers, &dt, &_finish));
+         }
 
       default:
          break;
@@ -320,10 +339,12 @@ void Window::fire()
 
 void Window::fireMissile()
 {
-   if (_MissileTimer->getCount() > MISSILE_DELAY_LASER_VERSUS)
-   {
-      missiles.push_back(std::make_shared<Missile> (ship->centre, Vector(250, 0), -4.71, 1, &dt));
-      _MissileTimer->srsTimer();
+   if (!ship->dead) {
+      if (_MissileTimer->getCount() > MISSILE_DELAY_LASER_VERSUS)
+         {
+            missiles.push_back(std::make_shared<Missile> (ship->centre, Vector(250, 0), -4.71, 1, &dt));
+            _MissileTimer->srsTimer();
+         }
    }
 }
 

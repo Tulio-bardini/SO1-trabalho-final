@@ -40,7 +40,7 @@ Ship::~Ship() {
 
 void Ship::run() {
    
-   while (!*_finish)
+   while (!*_finish && !dead)
    {
       centre = centre + speed * (*_dt);
       selectShipAnimation();
@@ -55,8 +55,10 @@ void Ship::run() {
 
 void Ship::draw() {
 
-   shipSprite->draw_region(row, col, 47.0, 40.0, centre, 0);
-   drawLife();
+   if (!dead) {
+      shipSprite->draw_region(row, col, 47.0, 40.0, centre, 0);
+      drawLife();
+   }
 
 }
 
@@ -96,7 +98,9 @@ void Ship::putY(int y) {
 }
 
 void Ship::fire() {
-   lasersShip->push_back(Laser(centre, al_map_rgb(20, 200, 20), TypeClassNumber, _dt, Vector(500, 0)));
+   if (!dead) {
+      lasersShip->push_back(Laser(centre, al_map_rgb(20, 200, 20), TypeClassNumber, _dt, Vector(500, 0)));
+   }
 }
 
 void Ship::hit(int damage) {
