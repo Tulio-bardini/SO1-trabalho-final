@@ -46,7 +46,7 @@ private:
         srand(time(0));
         game->init();
         game->run();
-
+        Thread::running()->thread_exit(0);
     }
 
     private:

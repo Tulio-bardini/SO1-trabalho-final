@@ -311,12 +311,14 @@ void Window::deleteThreads()
    enemyThread->join();
    coliderThread->join();
    enemyLasersThread->join();
+   mineThread->join();
 
    delete shipThread;
-   delete controller;
+   delete controllerThread;
    delete enemyThread;
    delete coliderThread;
    delete enemyLasersThread;
+   delete mineThread;
 }
 
 void Window::setTimers() {
