@@ -53,9 +53,6 @@ private:
     std::shared_ptr<Sprite> deathSprite;
     std::shared_ptr<Timer> _fireTimer;
     std::list<Laser> * _lasers;
-    Vector projSpeed;
-    int fireSpeed;
-    int lives;
     int dAnim;
     bool dAnim_complete;
     float *_dt;

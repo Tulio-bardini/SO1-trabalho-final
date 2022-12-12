@@ -26,7 +26,7 @@ EnemyPurple::EnemyPurple(Point cen, Vector spd, std::list<Laser> *lasers, float 
     _fireTimer->create();
     _fireTimer->startTimer();
 
-    //lasersThread = new Thread(Laser::runLaser, &lasers, _finish);
+    // lasersThread = new Thread(Laser::runLaser, &lasers, _finish);
 
     loadSprite();
     load_assets();
@@ -68,7 +68,6 @@ void EnemyPurple::draw()
     }
 }
 
-
 void EnemyPurple::deathAnim()
 {
     deathSprite->draw_death_anim(dAnim, centre, 0);
@@ -91,7 +90,6 @@ void EnemyPurple::fire()
     _lasers->push_back(Laser(centre, color, TypeClassNumber, _dt, Vector(-330, -50)));
 }
 
-
 // update position of enemy ships
 void EnemyPurple::update()
 {
@@ -103,7 +101,7 @@ void EnemyPurple::update()
         dead = true;
     }
 
-    if (_fireTimer->getCount() > 200 && !dead)
+    if (_fireTimer->getCount() > 150 && !dead)
     {
         fire();
         _fireTimer->srsTimer();

@@ -69,21 +69,18 @@ private:
     std::list< std::shared_ptr<Missile> > * _missiles;
 
     // general
-    int fireSpeed;
     int lives;
     int dAnim;
-    int hitbox;
     float *_dt;
     bool *_finish;
     // flags
     bool dAnim_complete;
-    bool fire;
     bool aliveBoss = false;
     bool targetable;
     std::shared_ptr<Sprite> bossSprite;
     std::shared_ptr<Sprite> bossDeath;
     // for animation
-    int col, row, spriteSheetIndex;
+    int col, row;
 };
 
 __END_API

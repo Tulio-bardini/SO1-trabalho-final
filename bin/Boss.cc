@@ -21,9 +21,8 @@ __BEGIN_API
 Boss::Boss(Ship *ship, std::list<std::shared_ptr<Missile>> *missiles,
            float *dt, std::list<Laser> *lasers, bool *finish) : speed(Vector(-100, 0)),
                                                                 lives(30), dAnim(0),
-                                                                dAnim_complete(false), fire(true)
+                                                                dAnim_complete(false)
 {
-    hitbox = 1;
     targetable = false;
     col = 0;
     row = 0;
@@ -59,16 +58,16 @@ Boss::~Boss()
 // When hit, decrement lives by 1
 void Boss::hit()
 {
-    
+
     if (lives > 1)
     {
         lives -= 1;
     }
-    else {
+    else
+    {
         dead = true;
         aliveBoss = false;
     }
-
 }
 
 // draw image to display the boss ship
@@ -105,7 +104,6 @@ void Boss::update()
     if (centre.x < 700 && !targetable)
     {
         targetable = true; // becomes targetable
-        hitbox = 80;       // set hitbox to 80
         speed.x = 0;       // no more x movement
         speed.y = 100;     // begin downward movement
     }
@@ -144,17 +142,13 @@ void Boss::chooseFrame()
     // middle damage animation--fire speed goes up.
     if (lives <= 35 && col == 0)
     {
-        fireSpeed = rand() % 50 + 20;
         speed = speed * 1.1; // increase speed
-        hitbox = 70;
         col = 1;
     }
     // final damage animation-- fire speed up again
     if (lives <= 20 && col == 1)
     {
-        fireSpeed = rand() % 30 + 20;
         speed = speed * 1.1; // increase speed
-        hitbox = 60;
         col = 2;
     }
 }
@@ -210,17 +204,16 @@ void Boss::fireMissile()
     Point shipLock = _ship->centre;
 
     aim.Angle(shipLock, centre + Point(0, 50), 0.9);
-    double ship_angle = atan(aim.y/aim.x)+4.71;
-    _missiles->push_back(std::make_shared<Missile> (centre + Point(0, 50), aim, ship_angle, TypeClassNumber, _dt));
+    double ship_angle = atan(aim.y / aim.x) + 4.71;
+    _missiles->push_back(std::make_shared<Missile>(centre + Point(0, 50), aim, ship_angle, TypeClassNumber, _dt));
     aim.Angle(shipLock, centre + Point(0, -50), 0.9);
-    ship_angle = atan(aim.y/aim.x)+4.71;
-    _missiles->push_back(std::make_shared<Missile> (centre + Point(0, -50), aim, ship_angle, TypeClassNumber, _dt));
+    ship_angle = atan(aim.y / aim.x) + 4.71;
+    _missiles->push_back(std::make_shared<Missile>(centre + Point(0, -50), aim, ship_angle, TypeClassNumber, _dt));
 }
 
 void Boss::restart()
 {
     dead = false;
-    hitbox = 1;
     targetable = false;
     col = 0;
     row = 0;
@@ -228,7 +221,6 @@ void Boss::restart()
     lives = BOSS_HP;
     size = SIZE_BOSS;
     speed = Vector(-100, 0);
-
 }
 
 void Boss::run()

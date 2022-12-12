@@ -7,7 +7,6 @@
 #include "traits.h"
 #include "thread.h"
 #include "semaphore.h"
-#include "Engine.h"
 #include "Window.h"
 #include <ctime>
 #include <cstdlib>

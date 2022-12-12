@@ -5,7 +5,7 @@ __BEGIN_API
 #define WEAPON_DELAY_LASER_VERSUS 10
 #define ORDER_ENEMYS_DELAY 200
 #define MINE_DELAY 1000
-#define  MISSILE_DELAY_LASER_VERSUS 100
+#define MISSILE_DELAY_LASER_VERSUS 100
 #define BOSS_DELAY 6000
 
 Window::Window(int w, int h, int fps) : _displayWidth(w), _displayHeight(h),
@@ -129,11 +129,13 @@ void Window::gameLoop(float &prevTime)
    dt = crtTime - prevTime;
    prevTime = crtTime;
 
-   if (boss->dead) {
+   if (boss->dead)
+   {
       _BossTimer->startTimer();
    }
 
-   if (!boss->getBossAlive()) {
+   if (!boss->getBossAlive())
+   {
       spawEnemies();
    }
 
@@ -181,7 +183,8 @@ void Window::draw()
    drawMissile();
    ship->draw();
    boss->draw();
-   if (ship->dead) {
+   if (ship->dead)
+   {
       game_over->draw_region(0, 0, 552.0, 273.0, Point(150, 100), 0);
    }
 }
@@ -227,23 +230,20 @@ void Window::drawMissile()
 void Window::drawLasers()
 {
    if (!lasers.empty())
-    {
-        for (std::list<Laser>::iterator it = lasers.begin();
-             it != lasers.end(); ++it)
-        {
-            it->draw();
-        }
-    }
+   {
+      for (std::list<Laser>::iterator it = lasers.begin();
+           it != lasers.end(); ++it)
+      {
+         it->draw();
+      }
+   }
 }
 
 void Window::loadSprites()
 {
    // represents the middle of the image width-wise, and top height-wise
    bgMid = Point(0, 0);
-   fgMid = Point(800, 0);
-   fg2Mid = Point(300, 300);
    bgSpeed = Vector(50, 0);
-   fgSpeed = Vector(-90, 0);
 
    // Go to resources directory
    ALLEGRO_PATH *path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
@@ -272,35 +272,41 @@ void Window::spawEnemies()
       {
       case 0: // V wave
          enemyList.push_back(std::make_shared<EnemyPurple>(Point(1100, 300),
-            enemySpeed, &lasers, &dt, &_finish));
+                                                           enemySpeed, &lasers, &dt, &_finish));
          enemyList.push_back(std::make_shared<EnemyPurple>(Point(1200, 350),
-            enemySpeed, &lasers, &dt, &_finish));
+                                                           enemySpeed, &lasers, &dt, &_finish));
          enemyList.push_back(std::make_shared<EnemyPurple>(Point(1200, 250),
-            enemySpeed, &lasers, &dt, &_finish));
+                                                           enemySpeed, &lasers, &dt, &_finish));
          enemyList.push_back(std::make_shared<EnemyPurple>(Point(1300, 400),
-            enemySpeed, &lasers, &dt, &_finish));
+                                                           enemySpeed, &lasers, &dt, &_finish));
          enemyList.push_back(std::make_shared<EnemyPurple>(Point(1300, 200),
-            enemySpeed, &lasers, &dt, &_finish));
+                                                           enemySpeed, &lasers, &dt, &_finish));
          enemyList.push_back(std::make_shared<EnemyPurple>(Point(1400, 100),
-            enemySpeed, &lasers, &dt, &_finish));
+                                                           enemySpeed, &lasers, &dt, &_finish));
          enemyList.push_back(std::make_shared<EnemyPurple>(Point(1400, 500),
-            enemySpeed, &lasers, &dt, &_finish));
+                                                           enemySpeed, &lasers, &dt, &_finish));
 
          break;
 
       case 1:
 
-         for (int i = 50; i < 300; i+= 50) {   
+         for (int i = 50; i < 300; i += 50)
+         {
             enemyList.push_back(std::make_shared<EnemyPurple>(Point(1200, i),
-            enemySpeed, &lasers, &dt, &_finish));
+                                                              enemySpeed, &lasers, &dt, &_finish));
          }
+
+         break;
 
       case 2:
 
-         for (int i = 350; i < 600; i+= 50) {   
+         for (int i = 350; i < 600; i += 50)
+         {
             enemyList.push_back(std::make_shared<EnemyPurple>(Point(1200, i),
-            enemySpeed, &lasers, &dt, &_finish));
+                                                              enemySpeed, &lasers, &dt, &_finish));
          }
+
+         break;
 
       default:
          break;
@@ -312,15 +318,17 @@ void Window::spawEnemies()
 
 void Window::spawMine()
 {
-   if (_MineTimer->getCount() > MINE_DELAY) {
-      mines.push_back(std::make_shared<Mine> (&dt, &lasers, &_finish));
+   if (_MineTimer->getCount() > MINE_DELAY)
+   {
+      mines.push_back(std::make_shared<Mine>(&dt, &lasers, &_finish));
       _MineTimer->srsTimer();
    }
-
 }
 
-void Window::spawBoss() {
-   if (_BossTimer->getCount() > BOSS_DELAY) {
+void Window::spawBoss()
+{
+   if (_BossTimer->getCount() > BOSS_DELAY)
+   {
       boss->setBossAlive();
       boss->restart();
       _BossTimer->resetCount();
@@ -339,12 +347,13 @@ void Window::fire()
 
 void Window::fireMissile()
 {
-   if (!ship->dead) {
+   if (!ship->dead)
+   {
       if (_MissileTimer->getCount() > MISSILE_DELAY_LASER_VERSUS)
-         {
-            missiles.push_back(std::make_shared<Missile> (ship->centre, Vector(250, 0), -4.71, 1, &dt));
-            _MissileTimer->srsTimer();
-         }
+      {
+         missiles.push_back(std::make_shared<Missile>(ship->centre, Vector(250, 0), -4.71, 1, &dt));
+         _MissileTimer->srsTimer();
+      }
    }
 }
 
@@ -399,7 +408,8 @@ void Window::deleteThreads()
    delete bossThread;
 }
 
-void Window::setTimers() {
+void Window::setTimers()
+{
    // Start timers
    _WeaponTimer = std::make_shared<Timer>(_fps);
    _WeaponTimer->create();
@@ -438,6 +448,5 @@ void Window::runBoss(Boss *boss)
 {
    boss->run();
 }
-
 
 __END_API

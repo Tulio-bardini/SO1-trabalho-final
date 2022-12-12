@@ -31,7 +31,6 @@ public:
 
   void load_sprites();
   void draw();
-  void deathAnim();
   void update();
 
   bool dead = false;
@@ -50,11 +49,8 @@ private:
   std::shared_ptr<Sprite> missileSprite5;
   std::shared_ptr<Sprite> missileSprite6;
   std::shared_ptr<Sprite> missileSprite7;
-  std::shared_ptr<Sprite> deathSprite;
 
-  bool dAnim_complete;
   int mAnim;
-  int dAnim;
   bool in_bound();
   double _angle;
   float *_dt;

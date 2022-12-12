@@ -1,22 +1,5 @@
 #include "colider.h"
 
-#include <allegro5/allegro_primitives.h>
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_ttf.h>
-#include <allegro5/allegro_image.h>
-#include <allegro5/allegro_audio.h>
-#include <allegro5/allegro_acodec.h>
-#include <stdexcept>
-#include <iostream>
-
-#include "Timer.h"
-#include "traits.h"
-#include "thread.h"
-#include "semaphore.h"
-#include "ship.h"
-#include "Laser.h"
-#include "Missile.h"
-
 __BEGIN_API
 
 Colider::Colider(Ship *ship, std::list<std::shared_ptr<EnemyPurple>> *enemies,

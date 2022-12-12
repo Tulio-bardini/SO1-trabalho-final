@@ -107,17 +107,11 @@ class Window {
    std::shared_ptr<Timer> _BossTimer;
 
    Point centre;        /**< ship position */
-   ALLEGRO_COLOR color; /**< ship color */   
-   Vector speed;        /**< movement speed in any direction */
-   int row;             /**<row of animation to be played */
-   int col;             /**< column of animation to be played */
+   ALLEGRO_COLOR color; /**< ship color */
 
    //Background
    Point bgMid;/**<point used by the background to draw from */
-   Point fgMid;
-   Point fg2Mid;
    Vector bgSpeed;/**<background movement speed */
-   Vector fgSpeed;
    std::shared_ptr<Sprite> bg;/**<shared pointer to background animation */
    std::shared_ptr<Sprite> fg;
    std::shared_ptr<Sprite> game_over;
@@ -163,7 +157,6 @@ class Window {
    ALLEGRO_DISPLAY *_display;
 
    bool _finish;
-   
 };
 
 __END_API

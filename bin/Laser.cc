@@ -5,7 +5,6 @@
  * @author
  */
 #include "Laser.h"
-#include <allegro5/allegro_primitives.h>
 
 __BEGIN_API
 

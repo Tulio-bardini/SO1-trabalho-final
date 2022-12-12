@@ -56,7 +56,6 @@ private:
     bool * _finish;
     float *_dt;
     bool death = false;
-    bool exploded = false;
 };
 
 

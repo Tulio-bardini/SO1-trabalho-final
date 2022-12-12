@@ -1,15 +1,10 @@
-#include <allegro5/allegro.h>
-
 #include "Missile.h"
-
-#include "Sprite.h"
 
 __BEGIN_API
 
 Missile::Missile(Point p, Vector s, double angle, int owner, float *dt)
 {
-   centre = p;
-   centre = centre + speed * 0.1;
+   centre = p + speed * 0.1;
    speed = s;
    _dt = dt;
    classOwner = owner;
