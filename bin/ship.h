@@ -20,18 +20,17 @@ __BEGIN_API
 class Ship {
 
 public:
-    Ship(bool *finish, float *dt);
+    Ship(bool *finish, std::list<Laser> *lasers, float *dt);
     ~Ship();
     void run(); 
     void putX(int x);
     void putY(int y);
     void draw();
-    void drawLaser();
     void drawLife();
     void fire();
     void hit(int damage);
 
-    std::list<Laser> lasers;
+    std::list<Laser> * lasersShip;
     std::shared_ptr<Sprite> shipSprite;
     Point centre;
     int row; /**<row of animation to be played */
@@ -45,7 +44,6 @@ private:
     void selectShipAnimation();
     void checkBoundary();
 
-    Thread * lasersThread;
     Vector speed;
     bool *_finish;
     float *_dt;

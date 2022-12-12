@@ -17,15 +17,14 @@
 __BEGIN_API
 
 #define MAX_LIFE 3
+#define TypeClassNumber 1
 
-Ship::Ship(bool *finish, float *dt)
+Ship::Ship(bool *finish, std::list<Laser> *lasers, float *dt)
 {
    centre = Point(215, 245);
    _finish = finish;
    _dt = dt;
-
-   // Create Laser
-   lasersThread = new Thread(Laser::runLaser, &lasers, _finish);
+   lasersShip = lasers;
 
    // Go to resources directory
    ALLEGRO_PATH *path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
@@ -51,11 +50,7 @@ void Ship::run() {
       Thread::yield();
    }
 
-   lasersThread->join();
-   delete lasersThread;
-
-   Thread::running()->thread_exit(0);
-    
+   Thread::running()->thread_exit(0);   
 }
 
 void Ship::draw() {
@@ -63,18 +58,6 @@ void Ship::draw() {
    shipSprite->draw_region(row, col, 47.0, 40.0, centre, 0);
    drawLife();
 
-}
-
-void Ship::drawLaser()
-{
-   if (!lasers.empty())
-   {
-      for (std::list<Laser>::iterator it = lasers.begin();
-           it != lasers.end(); ++it)
-      {
-         it->draw();
-      }
-   }
 }
 
 void Ship::selectShipAnimation() {
@@ -113,7 +96,7 @@ void Ship::putY(int y) {
 }
 
 void Ship::fire() {
-   lasers.push_back(Laser(centre, al_map_rgb(20, 200, 20), _dt, Vector(500, 0)));
+   lasersShip->push_back(Laser(centre, al_map_rgb(20, 200, 20), TypeClassNumber, _dt, Vector(500, 0)));
 }
 
 void Ship::hit(int damage) {

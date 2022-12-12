@@ -54,7 +54,7 @@ class Window {
    void setTimers();
 
    void fire();
-   void spawEnemys();
+   void spawEnemies();
    void spawMine();
 
    void gameLoop(float& prevTime);
@@ -83,7 +83,7 @@ class Window {
    static void runController(Controller * controller);
    static void runColider(Colider *colider);
 
-   std::list<Laser> enemyLasers;
+   std::list<Laser> lasers;
 
   private:
    void loadSprites();
