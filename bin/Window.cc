@@ -5,6 +5,7 @@ __BEGIN_API
 #define WEAPON_DELAY_LASER_VERSUS 10
 #define ORDER_ENEMYS_DELAY 200
 #define MINE_DELAY 160
+#define  MISSILE_DELAY_LASER_VERSUS 100
 
 Window::Window(int w, int h, int fps) : _displayWidth(w), _displayHeight(h),
                                         _fps(fps),
@@ -117,6 +118,12 @@ void Window::gameLoop(float &prevTime)
       controller->acao = act::action::NO_ACTION;
    }
 
+   if (controller->acao == act::action::FIRE_PRIMARY)
+   {
+      fireMissile();
+      controller->acao = act::action::NO_ACTION;
+   }
+
    crtTime = al_current_time();
    dt = crtTime - prevTime;
    prevTime = crtTime;
@@ -162,6 +169,7 @@ void Window::draw()
    drawEnemies();
    drawLasers();
    drawMine();
+   drawMissile();
    ship->draw();
 }
 
@@ -186,6 +194,17 @@ void Window::drawMine()
    if (!mines.empty())
    {
       for (auto it = mines.begin(); it != mines.end(); ++it)
+      {
+         (*it)->draw();
+      }
+   }
+}
+
+void Window::drawMissile()
+{
+   if (!missiles.empty())
+   {
+      for (auto it = missiles.begin(); it != missiles.end(); ++it)
       {
          (*it)->draw();
       }
@@ -280,6 +299,15 @@ void Window::fire()
    }
 }
 
+void Window::fireMissile()
+{
+   if (_MissileTimer->getCount() > MISSILE_DELAY_LASER_VERSUS)
+   {
+      missiles.push_back(std::make_shared<Missile> (ship->centre, Vector(250, 0), 1, &dt));
+      _MissileTimer->srsTimer();
+   }
+}
+
 void Window::createThreads()
 {
    // Create Ship
@@ -290,7 +318,7 @@ void Window::createThreads()
    controller = new Controller(&_finish, ship);
    controllerThread = new Thread(runController, controller);
 
-   colider = new Colider(ship, &enemyList, &lasers, &mines, &_finish);
+   colider = new Colider(ship, &enemyList, &lasers, &mines, &missiles, &_finish);
    coliderThread = new Thread(runColider, colider);
 
    // Create Enemys
@@ -301,6 +329,9 @@ void Window::createThreads()
 
    // Mines Thread
    mineThread = new Thread(Mine::runMine, &mines, &_finish);
+
+   // Mines Thread
+   missileThread = new Thread(Missile::runMissile, &missiles, &_finish);
 }
 
 void Window::deleteThreads()
@@ -311,6 +342,7 @@ void Window::deleteThreads()
    coliderThread->join();
    enemyLasersThread->join();
    mineThread->join();
+   missileThread->join();
 
    delete shipThread;
    delete controller;
@@ -318,6 +350,7 @@ void Window::deleteThreads()
    delete coliderThread;
    delete enemyLasersThread;
    delete mineThread;
+   delete missileThread;
 }
 
 void Window::setTimers() {
@@ -331,6 +364,9 @@ void Window::setTimers() {
    _MineTimer = std::make_shared<Timer>(_fps);
    _MineTimer->create();
    _MineTimer->startTimer();
+   _MissileTimer = std::make_shared<Timer>(_fps);
+   _MissileTimer->create();
+   _MissileTimer->startTimer();
 }
 
 void Window::runShip(Ship *ship)
