@@ -26,11 +26,12 @@ __BEGIN_API
 class Missile
 {
 public:
-  Missile(Point p, Vector s, int owner, float * dt);
+  Missile(Point p, Vector s, double angle, int owner, float * dt);
   ~Missile();
 
   void load_sprites();
   void draw();
+  void deathAnim();
   void update();
 
   bool dead = false;
@@ -49,10 +50,13 @@ private:
   std::shared_ptr<Sprite> missileSprite5;
   std::shared_ptr<Sprite> missileSprite6;
   std::shared_ptr<Sprite> missileSprite7;
+  std::shared_ptr<Sprite> deathSprite;
 
+  bool dAnim_complete;
   int mAnim;
+  int dAnim;
   bool in_bound();
-  double angle;
+  double _angle;
   float *_dt;
 };
 

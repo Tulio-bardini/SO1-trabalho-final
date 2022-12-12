@@ -16,6 +16,7 @@
 #include "Laser.h"
 #include "Mine.h"
 #include "Missile.h"
+#include "Boss.h"
 
 __BEGIN_API
 
@@ -25,12 +26,14 @@ class Colider
 public:
     Colider(Ship *ship, std::list<std::shared_ptr<EnemyPurple>> *enemies,
              std::list<Laser> *lasers, std::list< std::shared_ptr<Mine> > *mines, 
-             std::list< std::shared_ptr<Missile> > *missiles, bool *finish);
+             std::list< std::shared_ptr<Missile> > *missiles,
+             Boss * boss, bool *finish);
     ~Colider();
     void run();
     void checkCollisionOnEnemies();
     void checkCollisionOnPlayer();
     void checkCollisionOnMines();
+    void checkCollisionOnBoss();
 
 private:
     Ship *_ship;
@@ -38,6 +41,7 @@ private:
     std::list<Laser> *_lasers;
     std::list< std::shared_ptr<Mine> > *_mines;
     std::list< std::shared_ptr<Missile> > *_missiles;
+    Boss * _boss;
     bool *_finish;
 };
 

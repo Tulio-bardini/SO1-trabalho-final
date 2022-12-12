@@ -35,6 +35,7 @@
 #include "colider.h"
 #include "Mine.h"
 #include "Missile.h"
+#include "Boss.h"
 
 __BEGIN_API
 
@@ -58,6 +59,7 @@ class Window {
    void fireMissile();
    void spawEnemies();
    void spawMine();
+   void spawBoss();
 
    void gameLoop(float& prevTime);
 
@@ -85,6 +87,7 @@ class Window {
    static void runShip(Ship * ship);
    static void runController(Controller * controller);
    static void runColider(Colider *colider);
+   static void runBoss(Boss *boss);
 
    std::list<Laser> lasers;
    std::list< std::shared_ptr<Missile> > missiles;
@@ -99,6 +102,7 @@ class Window {
    std::shared_ptr<Timer> _EnemyTimer;
    std::shared_ptr<Timer> _MineTimer;
    std::shared_ptr<Timer> _MissileTimer;
+   std::shared_ptr<Timer> _BossTimer;
 
    Point centre;        /**< ship position */
    ALLEGRO_COLOR color; /**< ship color */   
@@ -126,6 +130,10 @@ class Window {
    //colider
    Colider * colider;
    Thread * coliderThread;
+
+   // Boss
+   Boss * boss;
+   Thread * bossThread;
 
    //mine
    Thread * mineThread;

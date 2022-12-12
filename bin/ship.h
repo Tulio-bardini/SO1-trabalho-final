@@ -39,12 +39,12 @@ public:
     bool dead = false;
     int life = 3;
     int lifeRestart = 2;
+    Vector speed;
 
 private:
     void selectShipAnimation();
     void checkBoundary();
 
-    Vector speed;
     bool *_finish;
     float *_dt;
 

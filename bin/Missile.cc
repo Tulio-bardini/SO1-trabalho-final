@@ -6,14 +6,14 @@
 
 __BEGIN_API
 
-Missile::Missile(Point p, Vector s, int owner, float *dt)
+Missile::Missile(Point p, Vector s, double angle, int owner, float *dt)
 {
    centre = p;
    centre = centre + speed * 0.1;
    speed = s;
    _dt = dt;
    classOwner = owner;
-   angle = -4.71;
+   _angle = angle;
    load_sprites();
 }
 
@@ -49,35 +49,35 @@ void Missile::draw()
 {
    
    if(mAnim == 0) {
-      missileSprite1->draw_rotated(centre, angle, 0);
+      missileSprite1->draw_rotated(centre, _angle, 0);
    }
    else if (mAnim == 1)
    {
-      missileSprite2->draw_rotated(centre, angle, 0);
+      missileSprite2->draw_rotated(centre, _angle, 0);
    }
    else if (mAnim == 2)
    {
-      missileSprite3->draw_rotated(centre, angle, 0);
+      missileSprite3->draw_rotated(centre, _angle, 0);
    }
    else if (mAnim == 3)
    {
-      missileSprite4->draw_rotated(centre, angle, 0);
+      missileSprite4->draw_rotated(centre, _angle, 0);
    }
    else if (mAnim == 4)
    {
-      missileSprite5->draw_rotated(centre, angle, 0);
+      missileSprite5->draw_rotated(centre, _angle, 0);
    }
    else if (mAnim == 5)
    {
-      missileSprite5->draw_rotated(centre, angle, 0);
+      missileSprite5->draw_rotated(centre, _angle, 0);
    }
    else if (mAnim == 6)
    {
-      missileSprite6->draw_rotated(centre, angle, 0);
+      missileSprite6->draw_rotated(centre, _angle, 0);
    }
    else if (mAnim == 7)
    {
-      missileSprite7->draw_rotated(centre, angle, 0);
+      missileSprite7->draw_rotated(centre, _angle, 0);
    }
 
    mAnim++;
@@ -109,6 +109,17 @@ void Missile::runMissile(std::list<std::shared_ptr<Missile>> *missiles, bool *fi
                (*it)->update();
             }
          }
+
+         std::list<std::shared_ptr<Missile>> newMissiles;
+            for (auto it = missiles->begin(); it != missiles->end(); ++it)
+            {
+                if ((*it)->live)
+                {
+                    newMissiles.push_back(*it);
+                }
+            }
+            missiles->clear();
+            missiles->assign(newMissiles.begin(), newMissiles.end());
 
       }
       Thread::yield();

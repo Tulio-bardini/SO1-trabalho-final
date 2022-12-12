@@ -21,7 +21,8 @@ __BEGIN_API
 
 Colider::Colider(Ship *ship, std::list<std::shared_ptr<EnemyPurple>> *enemies,
                  std::list<Laser> *lasers, std::list<std::shared_ptr<Mine>> *mines,
-                 std::list<std::shared_ptr<Missile>> *missiles, bool *finish)
+                 std::list<std::shared_ptr<Missile>> *missiles,
+                 Boss *boss, bool *finish)
 {
     _ship = ship;
     _enemies = enemies;
@@ -29,6 +30,7 @@ Colider::Colider(Ship *ship, std::list<std::shared_ptr<EnemyPurple>> *enemies,
     _lasers = lasers;
     _mines = mines;
     _missiles = missiles;
+    _boss = boss;
 }
 
 Colider::~Colider()
@@ -42,6 +44,7 @@ void Colider::run()
         checkCollisionOnEnemies();
         checkCollisionOnPlayer();
         checkCollisionOnMines();
+        checkCollisionOnBoss();
         Thread::yield();
     }
 
@@ -54,15 +57,15 @@ void Colider::checkCollisionOnMines()
     if (!_lasers->empty() && !_mines->empty() && _ship)
     {
         for (std::list<std::shared_ptr<Mine>>::iterator it_mine =
-                         _mines->begin();
-                     it_mine != _mines->end(); ++it_mine)
-                {
+                 _mines->begin();
+             it_mine != _mines->end(); ++it_mine)
+        {
             for (std::list<Laser>::iterator it_laser = _lasers->begin();
-                it_laser != _lasers->end(); ++it_laser)
+                 it_laser != _lasers->end(); ++it_laser)
             {
                 if (it_laser->classOwner == 1)
                 {
-                Point pt_laser = it_laser->centre;
+                    Point pt_laser = it_laser->centre;
 
                     // set bounding points
                     Point pt_mine = (*it_mine)->centre;
@@ -84,8 +87,8 @@ void Colider::checkCollisionOnMines()
                 }
             }
             for (std::list<std::shared_ptr<Missile>>::iterator it_missile =
-                _missiles->begin();
-                it_missile != _missiles->end(); ++it_missile)
+                     _missiles->begin();
+                 it_missile != _missiles->end(); ++it_missile)
             {
                 if ((*it_missile)->classOwner == 1)
                 {
@@ -106,7 +109,6 @@ void Colider::checkCollisionOnMines()
                         }
                     }
                 }
-
             }
         }
     }
@@ -148,8 +150,8 @@ void Colider::checkCollisionOnEnemies()
                 }
             }
             for (std::list<std::shared_ptr<Missile>>::iterator it_missile =
-                 _missiles->begin();
-             it_missile != _missiles->end(); ++it_missile)
+                     _missiles->begin();
+                 it_missile != _missiles->end(); ++it_missile)
             {
                 if ((*it_missile)->classOwner == 1)
                 {
@@ -170,7 +172,6 @@ void Colider::checkCollisionOnEnemies()
                         }
                     }
                 }
-
             }
         }
     }
@@ -179,7 +180,7 @@ void Colider::checkCollisionOnEnemies()
 void Colider::checkCollisionOnPlayer()
 {
 
-    if (!_enemies->empty() && _ship)
+    if (_ship)
     {
         for (std::list<Laser>::iterator it_laser = _lasers->begin();
              it_laser != _lasers->end(); ++it_laser)
@@ -243,6 +244,81 @@ void Colider::checkCollisionOnPlayer()
                 {
                     (*it_mine)->explode();
                     _ship->hit(1);
+                }
+            }
+        }
+        for (std::list<std::shared_ptr<Missile>>::iterator it_missile =
+                 _missiles->begin();
+             it_missile != _missiles->end(); ++it_missile)
+        {
+            if ((*it_missile)->classOwner == 2)
+            {
+                // set bounding points
+                Point pt_ship = _ship->centre;
+                int ship_size = _ship->size;
+
+                if (!_ship->dead)
+                {
+                    // check for collision
+                    if (((*it_missile)->centre.x > pt_ship.x - ship_size) &&
+                        ((*it_missile)->centre.x < pt_ship.x + ship_size) &&
+                        ((*it_missile)->centre.y > pt_ship.y - ship_size) &&
+                        ((*it_missile)->centre.y < pt_ship.y + ship_size))
+                    {
+                        // register damage on enemy and flag projectile as dead
+                        (_ship)->hit(1);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void Colider::checkCollisionOnBoss() {
+    if (!_boss->dead) {
+        for (std::list<Laser>::iterator it_laser = _lasers->begin();
+             it_laser != _lasers->end(); ++it_laser)
+        {
+            if (it_laser->classOwner == 1)
+            {
+                // set bounding points
+                Point pt_laser = it_laser->centre;
+                int boss_size = _boss->size;
+
+                // check for collision
+                if ((pt_laser.x > _boss->centre.x - boss_size) &&
+                    (pt_laser.x < _boss->centre.x + boss_size) &&
+                    (pt_laser.y > _boss->centre.y - boss_size) &&
+                    (pt_laser.y < _boss->centre.y + boss_size))
+                {
+                    // register damage on enemy and flag projectile as dead
+                    it_laser->live = false;
+                    _boss->hit();
+                }
+            }
+        }
+        for (std::list<std::shared_ptr<Missile>>::iterator it_missile =
+                 _missiles->begin();
+             it_missile != _missiles->end(); ++it_missile)
+        {
+            if ((*it_missile)->classOwner == 1)
+            {
+                // set bounding points
+                Point pt_boss = _boss->centre;
+                int boss_size = _boss->size;
+
+                if (!_boss->dead)
+                {
+                    // check for collision
+                    if (((*it_missile)->centre.x > pt_boss.x - boss_size) &&
+                        ((*it_missile)->centre.x < pt_boss.x + boss_size) &&
+                        ((*it_missile)->centre.y > pt_boss.y - boss_size) &&
+                        ((*it_missile)->centre.y < pt_boss.y + boss_size))
+                    {
+                        // register damage on enemy and flag projectile as dead
+                        (_boss)->hit();
+                        (*it_missile)->live = false;
+                    }
                 }
             }
         }

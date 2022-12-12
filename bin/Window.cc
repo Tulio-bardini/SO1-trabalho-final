@@ -4,8 +4,9 @@ __BEGIN_API
 
 #define WEAPON_DELAY_LASER_VERSUS 10
 #define ORDER_ENEMYS_DELAY 200
-#define MINE_DELAY 160
+#define MINE_DELAY 1000
 #define  MISSILE_DELAY_LASER_VERSUS 100
+#define BOSS_DELAY 1000
 
 Window::Window(int w, int h, int fps) : _displayWidth(w), _displayHeight(h),
                                         _fps(fps),
@@ -128,8 +129,16 @@ void Window::gameLoop(float &prevTime)
    dt = crtTime - prevTime;
    prevTime = crtTime;
 
-   spawEnemies();
+   if (boss->dead) {
+      _BossTimer->startTimer();
+   }
+
+   if (!boss->getBossAlive()) {
+      spawEnemies();
+   }
+
    spawMine();
+   spawBoss();
 
    // timer
    if (event.type == ALLEGRO_EVENT_TIMER)
@@ -171,6 +180,7 @@ void Window::draw()
    drawMine();
    drawMissile();
    ship->draw();
+   boss->draw();
 }
 
 void Window::drawBackground()
@@ -290,6 +300,15 @@ void Window::spawMine()
 
 }
 
+void Window::spawBoss() {
+   if (_BossTimer->getCount() > BOSS_DELAY) {
+      boss->setBossAlive();
+      boss->restart();
+      _BossTimer->resetCount();
+      _BossTimer->stopTimer();
+   }
+}
+
 void Window::fire()
 {
    if (_WeaponTimer->getCount() > WEAPON_DELAY_LASER_VERSUS)
@@ -303,7 +322,7 @@ void Window::fireMissile()
 {
    if (_MissileTimer->getCount() > MISSILE_DELAY_LASER_VERSUS)
    {
-      missiles.push_back(std::make_shared<Missile> (ship->centre, Vector(250, 0), 1, &dt));
+      missiles.push_back(std::make_shared<Missile> (ship->centre, Vector(250, 0), -4.71, 1, &dt));
       _MissileTimer->srsTimer();
    }
 }
@@ -318,8 +337,9 @@ void Window::createThreads()
    controller = new Controller(&_finish, ship);
    controllerThread = new Thread(runController, controller);
 
-   colider = new Colider(ship, &enemyList, &lasers, &mines, &missiles, &_finish);
-   coliderThread = new Thread(runColider, colider);
+   // boss
+   boss = new Boss(ship, &missiles, &dt, &lasers, &_finish);
+   bossThread = new Thread(runBoss, boss);
 
    // Create Enemys
    enemyThread = new Thread(EnemyPurple::runEnemies, &enemyList, &_finish);
@@ -332,6 +352,9 @@ void Window::createThreads()
 
    // Mines Thread
    missileThread = new Thread(Missile::runMissile, &missiles, &_finish);
+
+   colider = new Colider(ship, &enemyList, &lasers, &mines, &missiles, boss, &_finish);
+   coliderThread = new Thread(runColider, colider);
 }
 
 void Window::deleteThreads()
@@ -343,6 +366,7 @@ void Window::deleteThreads()
    enemyLasersThread->join();
    mineThread->join();
    missileThread->join();
+   bossThread->join();
 
    delete shipThread;
    delete controllerThread;
@@ -351,6 +375,7 @@ void Window::deleteThreads()
    delete enemyLasersThread;
    delete mineThread;
    delete missileThread;
+   delete bossThread;
 }
 
 void Window::setTimers() {
@@ -367,6 +392,9 @@ void Window::setTimers() {
    _MissileTimer = std::make_shared<Timer>(_fps);
    _MissileTimer->create();
    _MissileTimer->startTimer();
+   _BossTimer = std::make_shared<Timer>(_fps);
+   _BossTimer->create();
+   _BossTimer->startTimer();
 }
 
 void Window::runShip(Ship *ship)
@@ -383,6 +411,11 @@ void Window::runController(Controller *controller)
 void Window::runColider(Colider *colider)
 {
    colider->run();
+}
+
+void Window::runBoss(Boss *boss)
+{
+   boss->run();
 }
 
 
