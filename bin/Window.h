@@ -34,6 +34,7 @@
 #include "enemyPurple.h"
 #include "colider.h"
 #include "Mine.h"
+#include "Missile.h"
 
 __BEGIN_API
 
@@ -54,6 +55,7 @@ class Window {
    void setTimers();
 
    void fire();
+   void fireMissile();
    void spawEnemies();
    void spawMine();
 
@@ -63,6 +65,7 @@ class Window {
    void drawEnemies();
    void drawMine();
    void drawLasers();
+   void drawMissile();
 
    // Threads
    void createThreads();
@@ -84,15 +87,18 @@ class Window {
    static void runColider(Colider *colider);
 
    std::list<Laser> lasers;
+   std::list< std::shared_ptr<Missile> > missiles;
 
   private:
    void loadSprites();
    //Checks data sprites
    std::list< std::shared_ptr<EnemyPurple> > enemyList;
    std::list< std::shared_ptr<Mine> > mines;
+   
    std::shared_ptr<Timer> _WeaponTimer;
    std::shared_ptr<Timer> _EnemyTimer;
    std::shared_ptr<Timer> _MineTimer;
+   std::shared_ptr<Timer> _MissileTimer;
 
    Point centre;        /**< ship position */
    ALLEGRO_COLOR color; /**< ship color */   
@@ -129,6 +135,9 @@ class Window {
 
    // Enemies Lasers
    Thread * enemyLasersThread;
+
+   // Missile
+   Thread * missileThread;
 
    // general game variables
    int _displayWidth;
