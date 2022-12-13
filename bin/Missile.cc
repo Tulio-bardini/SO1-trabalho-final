@@ -42,8 +42,9 @@ void Missile::update()
 
 void Missile::draw()
 {
-   
-   if(mAnim == 0) {
+
+   if (mAnim == 0)
+   {
       missileSprite1->draw_rotated(centre, _angle, 0);
    }
    else if (mAnim == 1)
@@ -106,16 +107,15 @@ void Missile::runMissile(std::list<std::shared_ptr<Missile>> *missiles, bool *fi
          }
 
          std::list<std::shared_ptr<Missile>> newMissiles;
-            for (auto it = missiles->begin(); it != missiles->end(); ++it)
+         for (auto it = missiles->begin(); it != missiles->end(); ++it)
+         {
+            if ((*it)->live)
             {
-                if ((*it)->live)
-                {
-                    newMissiles.push_back(*it);
-                }
+               newMissiles.push_back(*it);
             }
-            missiles->clear();
-            missiles->assign(newMissiles.begin(), newMissiles.end());
-
+         }
+         missiles->clear();
+         missiles->assign(newMissiles.begin(), newMissiles.end());
       }
       Thread::yield();
    }

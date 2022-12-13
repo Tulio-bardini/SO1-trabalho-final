@@ -23,27 +23,25 @@
 
 __BEGIN_API
 
+class Laser
+{
+public:
+  Laser(Point p, ALLEGRO_COLOR c, int owner, float *dt, Vector s);
+  ~Laser();
 
-class Laser {
-  public:
-    Laser(Point p, ALLEGRO_COLOR c, int owner, float *dt, Vector s);   
-    ~Laser();
+  Point centre;
+  bool live;
+  ALLEGRO_COLOR color;
 
-    Point centre;
-    bool live;
-    ALLEGRO_COLOR color;
+  static void runLaser(std::list<Laser> *laserVector, bool *finish);
+  void update();
+  void draw();
+  Vector speed;
+  int classOwner;
 
-    static void runLaser(std::list<Laser> *laserVector, bool *finish);
-    void update();
-    void draw();
-    Vector speed;
-    int classOwner;
-
-    private:
-    float *_dt;
-    bool in_bound();
-    
-    
+private:
+  float *_dt;
+  bool in_bound();
 };
 
 __END_API

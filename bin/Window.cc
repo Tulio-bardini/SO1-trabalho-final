@@ -375,7 +375,7 @@ void Window::createThreads()
    enemyThread = new Thread(EnemyPurple::runEnemies, &enemyList, &_finish);
 
    // Laser Thread
-   enemyLasersThread = new Thread(Laser::runLaser, &lasers, &_finish);
+   lasersThread = new Thread(Laser::runLaser, &lasers, &_finish);
 
    // Mines Thread
    mineThread = new Thread(Mine::runMine, &mines, &_finish);
@@ -393,7 +393,7 @@ void Window::deleteThreads()
    controllerThread->join();
    enemyThread->join();
    coliderThread->join();
-   enemyLasersThread->join();
+   lasersThread->join();
    mineThread->join();
    missileThread->join();
    bossThread->join();
@@ -402,7 +402,7 @@ void Window::deleteThreads()
    delete controllerThread;
    delete enemyThread;
    delete coliderThread;
-   delete enemyLasersThread;
+   delete lasersThread;
    delete mineThread;
    delete missileThread;
    delete bossThread;

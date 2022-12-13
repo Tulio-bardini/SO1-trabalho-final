@@ -34,7 +34,7 @@ class Boss
 {
 
 public:
-    Boss(Ship * ship, std::list<std::shared_ptr<Missile>> *missiles , float *dt, std::list<Laser> *lasers, bool *finish);
+    Boss(Ship *ship, std::list<std::shared_ptr<Missile>> *missiles, float *dt, std::list<Laser> *lasers, bool *finish);
     ~Boss();
 
     Point centre;
@@ -64,9 +64,9 @@ private:
     std::shared_ptr<Timer> fireLaserDelay2;
     std::shared_ptr<Timer> fireMissileDelay;
     // lists
-    std::list<Laser> * _lasers;
-    Ship * _ship;
-    std::list< std::shared_ptr<Missile> > * _missiles;
+    std::list<Laser> *_lasers;
+    Ship *_ship;
+    std::list<std::shared_ptr<Missile>> *_missiles;
 
     // general
     int lives;

@@ -17,11 +17,13 @@ __BEGIN_API
 class Main
 {
 public:
-    Main() {
+    Main()
+    {
     }
 
-    static void run(void * name) {
-        std::cout << (char *) name << ": inicio\n";
+    static void run(void *name)
+    {
+        std::cout << (char *)name << ": inicio\n";
 
         Window shooty(800, 600, 60);
 
@@ -30,8 +32,8 @@ public:
         int ec = game->join();
         game->thread_exit(ec);
 
-        std::cout << (char *) name << ": fim\n";
-        
+        std::cout << (char *)name << ": fim\n";
+
         delete game;
     }
 
@@ -39,18 +41,16 @@ public:
 
 private:
 
-    static const int ITERATIONS = 10;
-
-    static void runGame(Window* game) {
+    static void runGame(Window *game)
+    {
         srand(time(0));
         game->init();
         game->run();
         Thread::running()->thread_exit(0);
     }
 
-    private:
-        static Thread *game;
-
+private:
+    static Thread *game;
 };
 
 __END_API

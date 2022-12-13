@@ -257,8 +257,10 @@ void Colider::checkCollisionOnPlayer()
     }
 }
 
-void Colider::checkCollisionOnBoss() {
-    if (!_boss->dead) {
+void Colider::checkCollisionOnBoss()
+{
+    if (!_boss->dead)
+    {
         for (std::list<Laser>::iterator it_laser = _lasers->begin();
              it_laser != _lasers->end(); ++it_laser)
         {

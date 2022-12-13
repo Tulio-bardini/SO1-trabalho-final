@@ -52,12 +52,11 @@ private:
     std::shared_ptr<Sprite> enemySprite;
     std::shared_ptr<Sprite> deathSprite;
     std::shared_ptr<Timer> _fireTimer;
-    std::list<Laser> * _lasers;
+    std::list<Laser> *_lasers;
     int dAnim;
     bool dAnim_complete;
     float *_dt;
     bool *_finish;
-    
 };
 
 __END_API

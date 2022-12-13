@@ -26,7 +26,7 @@ __BEGIN_API
 class Missile
 {
 public:
-  Missile(Point p, Vector s, double angle, int owner, float * dt);
+  Missile(Point p, Vector s, double angle, int owner, float *dt);
   ~Missile();
 
   void load_sprites();

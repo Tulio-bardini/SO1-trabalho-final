@@ -18,22 +18,25 @@ Laser::Laser(Point p, ALLEGRO_COLOR c, int owner, float *dt, Vector s)
    classOwner = owner;
 }
 
-Laser::~Laser() {
-   
+Laser::~Laser()
+{
 }
 
-void Laser::update() {
+void Laser::update()
+{
    centre = centre + speed * (*_dt);
    if (!in_bound())
       live = false;
 }
 
-void Laser::draw() {
+void Laser::draw()
+{
    Point tracer = (centre) + (speed) * (-0.04);
    al_draw_line(centre.x, centre.y, tracer.x, tracer.y, color, 3);
 }
 
-bool Laser::in_bound() {
+bool Laser::in_bound()
+{
    if ((centre.x > 1000) ||
        (centre.x < 0) ||
        (centre.y > 600) ||

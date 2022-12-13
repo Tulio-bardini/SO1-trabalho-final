@@ -43,14 +43,15 @@ __BEGIN_API
 class Menu;
 class Root;
 
-class Window {
-      
-  public:
+class Window
+{
+
+public:
    Window(int w, int h, int fps);
    ~Window();
 
-   ALLEGRO_FONT* _font24 = NULL;
-   
+   ALLEGRO_FONT *_font24 = NULL;
+
    void init();
    void run();
    void draw();
@@ -63,7 +64,7 @@ class Window {
    void spawMine();
    void spawBoss();
 
-   void gameLoop(float& prevTime);
+   void gameLoop(float &prevTime);
 
    void drawBackground();
    void drawEnemies();
@@ -75,31 +76,34 @@ class Window {
    void createThreads();
    void deleteThreads();
 
-   inline int getWidth() const {
+   inline int getWidth() const
+   {
       return _displayWidth;
    }
-   inline int getHeight() const {
+   inline int getHeight() const
+   {
       return _displayHeight;
    }
-   inline int getFps() const {
+   inline int getFps() const
+   {
       return _fps;
    }
 
-   //Static Functions
-   static void runShip(Ship * ship);
-   static void runController(Controller * controller);
+   // Static Functions
+   static void runShip(Ship *ship);
+   static void runController(Controller *controller);
    static void runColider(Colider *colider);
    static void runBoss(Boss *boss);
 
    std::list<Laser> lasers;
-   std::list< std::shared_ptr<Missile> > missiles;
+   std::list<std::shared_ptr<Missile>> missiles;
 
-  private:
+private:
    void loadSprites();
-   //Checks data sprites
-   std::list< std::shared_ptr<EnemyPurple> > enemyList;
-   std::list< std::shared_ptr<Mine> > mines;
-   
+   // Checks data sprites
+   std::list<std::shared_ptr<EnemyPurple>> enemyList;
+   std::list<std::shared_ptr<Mine>> mines;
+
    std::shared_ptr<Timer> _WeaponTimer;
    std::shared_ptr<Timer> _EnemyTimer;
    std::shared_ptr<Timer> _MineTimer;
@@ -109,40 +113,40 @@ class Window {
    Point centre;        /**< ship position */
    ALLEGRO_COLOR color; /**< ship color */
 
-   //Background
-   Point bgMid;/**<point used by the background to draw from */
-   Vector bgSpeed;/**<background movement speed */
-   std::shared_ptr<Sprite> bg;/**<shared pointer to background animation */
+   // Background
+   Point bgMid;                /**<point used by the background to draw from */
+   Vector bgSpeed;             /**<background movement speed */
+   std::shared_ptr<Sprite> bg; /**<shared pointer to background animation */
    std::shared_ptr<Sprite> fg;
    std::shared_ptr<Sprite> game_over;
 
-   //ship
-   Ship * ship;
-   Thread * shipThread;
+   // ship
+   Ship *ship;
+   Thread *shipThread;
 
-   //controller
-   Controller * controller;
-   Thread * controllerThread;
+   // controller
+   Controller *controller;
+   Thread *controllerThread;
 
-   //colider
-   Colider * colider;
-   Thread * coliderThread;
+   // colider
+   Colider *colider;
+   Thread *coliderThread;
 
    // Boss
-   Boss * boss;
-   Thread * bossThread;
+   Boss *boss;
+   Thread *bossThread;
 
-   //mine
-   Thread * mineThread;
+   // mine
+   Thread *mineThread;
 
-   //enemys
-   Thread * enemyThread;
+   // enemys
+   Thread *enemyThread;
 
    // Enemies Lasers
-   Thread * enemyLasersThread;
+   Thread *lasersThread;
 
    // Missile
-   Thread * missileThread;
+   Thread *missileThread;
 
    // general game variables
    int _displayWidth;

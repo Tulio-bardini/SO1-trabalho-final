@@ -24,17 +24,19 @@
 
 __BEGIN_API
 
-class Controller {
+class Controller
+{
 
 public:
-    Controller(bool *finish ,Ship *shipVec);
+    Controller(bool *finish, Ship *shipVec);
 
     void input();
     act::action acao;
     ALLEGRO_KEYBOARD_STATE kb;
+
 private:
-    Ship * ship;
-    bool * _finish;
+    Ship *ship;
+    bool *_finish;
     // general game variables
 };
 

@@ -34,9 +34,9 @@ class Colider
 
 public:
     Colider(Ship *ship, std::list<std::shared_ptr<EnemyPurple>> *enemies,
-             std::list<Laser> *lasers, std::list< std::shared_ptr<Mine> > *mines, 
-             std::list< std::shared_ptr<Missile> > *missiles,
-             Boss * boss, bool *finish);
+            std::list<Laser> *lasers, std::list<std::shared_ptr<Mine>> *mines,
+            std::list<std::shared_ptr<Missile>> *missiles,
+            Boss *boss, bool *finish);
     ~Colider();
     void run();
     void checkCollisionOnEnemies();
@@ -48,9 +48,9 @@ private:
     Ship *_ship;
     std::list<std::shared_ptr<EnemyPurple>> *_enemies;
     std::list<Laser> *_lasers;
-    std::list< std::shared_ptr<Mine> > *_mines;
-    std::list< std::shared_ptr<Missile> > *_missiles;
-    Boss * _boss;
+    std::list<std::shared_ptr<Mine>> *_mines;
+    std::list<std::shared_ptr<Missile>> *_missiles;
+    Boss *_boss;
     bool *_finish;
 };
 
